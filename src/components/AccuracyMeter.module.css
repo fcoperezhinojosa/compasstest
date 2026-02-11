@@ -1,0 +1,49 @@
+.meter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: 0.8rem;
+  color: #556688;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.bar {
+  flex: 1;
+  height: 8px;
+  background: #111d35;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: #ff4466;
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.2s, background-color 0.3s;
+}
+
+.good {
+  background: #ffaa00;
+}
+
+.great {
+  background: #00ff88;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+.value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #8899bb;
+  width: 3.5rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
