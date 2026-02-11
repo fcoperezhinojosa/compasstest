@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Compass Challenge</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Desktop blocker -->
+  <div id="desktop-blocker" class="screen hidden">
+    <div class="desktop-message">
+      <div class="phone-icon">&#128241;</div>
+      <h1>Mobile Only</h1>
+      <p>This app requires a mobile device with a compass sensor.</p>
+      <p>Please open this page on your phone or tablet.</p>
+    </div>
+  </div>
+
+  <!-- Permission screen -->
+  <div id="permission-screen" class="screen hidden">
+    <div class="permission-content">
+      <div class="compass-icon-large">&#9978;</div>
+      <h1>Compass Challenge</h1>
+      <p class="subtitle">A Sailboat Navigation Test</p>
+      <p class="description">This app needs access to your device's compass sensor to work.</p>
+      <button id="btn-grant-permission" class="btn btn-primary">Enable Compass</button>
+    </div>
+  </div>
+
+  <!-- Home screen -->
+  <div id="home-screen" class="screen hidden">
+    <div class="home-content">
+      <div class="home-header">
+        <div class="compass-icon-large animated">&#9978;</div>
+        <h1>Compass Challenge</h1>
+        <p class="subtitle">Sailboat Navigation Test</p>
+      </div>
+      <div class="home-stats">
+        <div class="stat-box">
+          <span class="stat-value" id="home-best-score">0</span>
+          <span class="stat-label">Best Score</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="home-challenges-won">0</span>
+          <span class="stat-label">Wins</span>
+        </div>
+      </div>
+      <div class="home-actions">
+        <button id="btn-quick-play" class="btn btn-primary">Quick Play</button>
+        <button id="btn-challenge-mode" class="btn btn-secondary">Voyage Mode</button>
+        <button id="btn-free-compass" class="btn btn-outline">Free Compass</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Free compass screen -->
+  <div id="free-compass-screen" class="screen hidden">
+    <div class="top-bar">
+      <button id="btn-free-back" class="btn-icon">&larr;</button>
+      <span class="top-bar-title">Free Compass</span>
+      <span></span>
+    </div>
+    <div class="compass-container">
+      <div class="compass-frame">
+        <div class="compass-rose" id="free-compass-rose">
+          <div class="compass-dial">
+            <span class="cardinal north">N</span>
+            <span class="cardinal east">E</span>
+            <span class="cardinal south">S</span>
+            <span class="cardinal west">W</span>
+            <span class="intercardinal ne">NE</span>
+            <span class="intercardinal se">SE</span>
+            <span class="intercardinal sw">SW</span>
+            <span class="intercardinal nw">NW</span>
+            <div class="tick-marks"></div>
+          </div>
+        </div>
+        <div class="compass-needle"></div>
+        <div class="compass-center-dot"></div>
+      </div>
+      <div class="bearing-display">
+        <span class="bearing-value" id="free-bearing">0</span>
+        <span class="bearing-unit">&deg;</span>
+        <span class="bearing-direction" id="free-direction">N</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge screen -->
+  <div id="challenge-screen" class="screen hidden">
+    <div class="top-bar">
+      <button id="btn-challenge-back" class="btn-icon">&larr;</button>
+      <div class="challenge-timer-bar">
+        <div class="timer-fill" id="timer-fill"></div>
+      </div>
+      <div class="challenge-score">
+        <span id="current-score">0</span> pts
+      </div>
+    </div>
+
+    <div class="challenge-header">
+      <div class="challenge-instruction" id="challenge-instruction">
+        Find the North!
+      </div>
+      <div class="challenge-detail" id="challenge-detail">
+        Point your device towards North (0&deg;)
+      </div>
+      <div class="challenge-counter" id="challenge-counter">1 / 5</div>
+    </div>
+
+    <div class="compass-container">
+      <div class="compass-frame">
+        <div class="target-indicator" id="target-indicator"></div>
+        <div class="compass-rose" id="challenge-compass-rose">
+          <div class="compass-dial">
+            <span class="cardinal north">N</span>
+            <span class="cardinal east">E</span>
+            <span class="cardinal south">S</span>
+            <span class="cardinal west">W</span>
+            <span class="intercardinal ne">NE</span>
+            <span class="intercardinal se">SE</span>
+            <span class="intercardinal sw">SW</span>
+            <span class="intercardinal nw">NW</span>
+            <div class="tick-marks"></div>
+          </div>
+        </div>
+        <div class="compass-needle"></div>
+        <div class="compass-center-dot"></div>
+      </div>
+      <div class="bearing-display">
+        <span class="bearing-value" id="challenge-bearing">0</span>
+        <span class="bearing-unit">&deg;</span>
+        <span class="bearing-direction" id="challenge-direction">N</span>
+      </div>
+    </div>
+
+    <div class="accuracy-meter">
+      <div class="accuracy-label">Accuracy</div>
+      <div class="accuracy-bar">
+        <div class="accuracy-fill" id="accuracy-fill"></div>
+      </div>
+      <div class="accuracy-value" id="accuracy-value">0%</div>
+    </div>
+
+    <div class="challenge-feedback hidden" id="challenge-feedback">
+      <div class="feedback-icon" id="feedback-icon"></div>
+      <div class="feedback-text" id="feedback-text"></div>
+      <div class="feedback-points" id="feedback-points"></div>
+    </div>
+  </div>
+
+  <!-- Voyage mode screen -->
+  <div id="voyage-screen" class="screen hidden">
+    <div class="top-bar">
+      <button id="btn-voyage-back" class="btn-icon">&larr;</button>
+      <div class="challenge-timer-bar">
+        <div class="timer-fill" id="voyage-timer-fill"></div>
+      </div>
+      <div class="challenge-score">
+        <span id="voyage-score">0</span> pts
+      </div>
+    </div>
+
+    <div class="voyage-map" id="voyage-map">
+      <div class="voyage-progress" id="voyage-progress"></div>
+    </div>
+
+    <div class="challenge-header">
+      <div class="voyage-leg" id="voyage-leg">Leg 1 of 5</div>
+      <div class="challenge-instruction" id="voyage-instruction">
+        Set sail Northeast!
+      </div>
+      <div class="challenge-detail" id="voyage-detail">
+        Navigate to 45&deg;
+      </div>
+    </div>
+
+    <div class="compass-container compact">
+      <div class="compass-frame">
+        <div class="target-indicator" id="voyage-target-indicator"></div>
+        <div class="compass-rose" id="voyage-compass-rose">
+          <div class="compass-dial">
+            <span class="cardinal north">N</span>
+            <span class="cardinal east">E</span>
+            <span class="cardinal south">S</span>
+            <span class="cardinal west">W</span>
+            <span class="intercardinal ne">NE</span>
+            <span class="intercardinal se">SE</span>
+            <span class="intercardinal sw">SW</span>
+            <span class="intercardinal nw">NW</span>
+            <div class="tick-marks"></div>
+          </div>
+        </div>
+        <div class="compass-needle"></div>
+        <div class="compass-center-dot"></div>
+      </div>
+      <div class="bearing-display">
+        <span class="bearing-value" id="voyage-bearing">0</span>
+        <span class="bearing-unit">&deg;</span>
+        <span class="bearing-direction" id="voyage-direction">N</span>
+      </div>
+    </div>
+
+    <div class="accuracy-meter">
+      <div class="accuracy-label">On Course</div>
+      <div class="accuracy-bar">
+        <div class="accuracy-fill" id="voyage-accuracy-fill"></div>
+      </div>
+      <div class="accuracy-value" id="voyage-accuracy-value">0%</div>
+    </div>
+  </div>
+
+  <!-- Results screen -->
+  <div id="results-screen" class="screen hidden">
+    <div class="results-content">
+      <div class="results-header">
+        <div class="results-icon" id="results-icon">&#9978;</div>
+        <h2 id="results-title">Challenge Complete!</h2>
+      </div>
+      <div class="results-score">
+        <span class="results-score-value" id="results-score-value">0</span>
+        <span class="results-score-label">Total Points</span>
+      </div>
+      <div class="results-stars" id="results-stars"></div>
+      <div class="results-breakdown" id="results-breakdown"></div>
+      <div class="results-actions">
+        <button id="btn-play-again" class="btn btn-primary">Play Again</button>
+        <button id="btn-results-home" class="btn btn-outline">Home</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="compass.js"></script>
+  <script src="challenges.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
