@@ -10,6 +10,7 @@ interface FeedbackProps {
   points: number;
   onDone: () => void;
   duration?: number;
+  sailingTip?: string;
 }
 
 export default function Feedback({
@@ -19,12 +20,15 @@ export default function Feedback({
   points,
   onDone,
   duration = 1500,
+  sailingTip,
 }: FeedbackProps) {
+  const tipDuration = sailingTip ? duration + 1500 : duration;
+
   useEffect(() => {
     if (!visible) return;
-    const timer = setTimeout(onDone, duration);
+    const timer = setTimeout(onDone, tipDuration);
     return () => clearTimeout(timer);
-  }, [visible, onDone, duration]);
+  }, [visible, onDone, tipDuration]);
 
   if (!visible) return null;
 
@@ -37,6 +41,12 @@ export default function Feedback({
       <div className={styles.points}>
         {success ? `+${points} points` : "No points"}
       </div>
+      {sailingTip && (
+        <div className={styles.tipBox}>
+          <div className={styles.tipLabel}>Sailing Tip</div>
+          <div className={styles.tipText}>{sailingTip}</div>
+        </div>
+      )}
     </div>
   );
 }

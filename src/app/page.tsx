@@ -11,8 +11,12 @@ import {
   Challenge,
   ChallengeResult,
   VoyageRoute,
+  WindChallenge,
+  SailingDifficulty,
   generateQuickPlay,
   getRandomVoyage,
+  generateWindChallenges,
+  getWindTarget,
   calculateAccuracy,
   isOnTarget,
   calculateBonus,
@@ -21,6 +25,8 @@ import {
   saveStats,
   getSuccessMessage,
   getFailMessage,
+  SAILING_TUTORIAL_STEPS,
+  POINTS_OF_SAIL,
 } from "@/lib/challenges";
 import styles from "./page.module.css";
 
@@ -28,9 +34,13 @@ type Screen =
   | "desktop"
   | "permission"
   | "home"
+  | "gameMenu"
   | "freeCompass"
   | "quickplay"
   | "voyage"
+  | "sailingDifficulty"
+  | "sailingTutorial"
+  | "windChallenge"
   | "results";
 
 const LOCK_DURATION = 1200;
@@ -59,6 +69,7 @@ export default function Home() {
     success: false,
     message: "",
     points: 0,
+    sailingTip: "",
   });
 
   // Voyage state
@@ -66,8 +77,15 @@ export default function Home() {
   const [voyageLeg, setVoyageLeg] = useState(0);
   const [voyageCompleted, setVoyageCompleted] = useState<boolean[]>([]);
 
+  // Wind / Sailing School state
+  const [windChallenges, setWindChallenges] = useState<WindChallenge[]>([]);
+  const [windIndex, setWindIndex] = useState(0);
+  const [sailingDifficulty, setSailingDifficulty] = useState<SailingDifficulty>("beginner");
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const hasSeenTutorialRef = useRef(false);
+
   // Game mode ref for results
-  const gameModeRef = useRef<"quickplay" | "voyage">("quickplay");
+  const gameModeRef = useRef<"quickplay" | "voyage" | "windChallenge">("quickplay");
 
   // --- Init ---
   useEffect(() => {
@@ -91,11 +109,29 @@ export default function Home() {
   }, [compass.isMobile, compass.isSupported]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // --- Compass heading handler for challenges ---
+  // For wind challenges, build a Challenge-like object from WindChallenge
+  const currentWindChallenge =
+    screen === "windChallenge" && windChallenges[windIndex]
+      ? windChallenges[windIndex]
+      : null;
+
+  const windTarget = currentWindChallenge ? getWindTarget(currentWindChallenge) : 0;
+
   const currentChallenge =
     screen === "quickplay" && challenges[challengeIndex]
       ? challenges[challengeIndex]
       : screen === "voyage" && voyage
       ? voyage.legs[voyageLeg]
+      : screen === "windChallenge" && currentWindChallenge
+      ? {
+          type: "wind",
+          target: windTarget,
+          instruction: currentWindChallenge.instruction,
+          detail: currentWindChallenge.detail,
+          timeLimit: currentWindChallenge.timeLimit,
+          threshold: currentWindChallenge.threshold,
+          points: currentWindChallenge.points,
+        } as Challenge
       : null;
 
   useEffect(() => {
@@ -177,6 +213,40 @@ export default function Home() {
     setScreen("voyage");
   }, []);
 
+  // --- Sailing School ---
+  const openSailingDifficulty = useCallback(() => {
+    setScreen("sailingDifficulty");
+  }, []);
+
+  const selectSailingDifficulty = useCallback((diff: SailingDifficulty) => {
+    setSailingDifficulty(diff);
+    if (!hasSeenTutorialRef.current) {
+      setTutorialStep(0);
+      setScreen("sailingTutorial");
+    } else {
+      startSailingGame(diff);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const startSailingGame = useCallback((diff: SailingDifficulty) => {
+    gameModeRef.current = "windChallenge";
+    const wc = generateWindChallenges(5, diff);
+    setWindChallenges(wc);
+    setWindIndex(0);
+    setScore(0);
+    setResults([]);
+    setAccuracy(0);
+    setLocked(false);
+    lockStartRef.current = null;
+    setTimerDuration(wc[0].timeLimit);
+    setTimerRunning(true);
+    setScreen("windChallenge");
+  }, []);
+
+  const startWindChallenge = useCallback(() => {
+    startSailingGame(sailingDifficulty);
+  }, [sailingDifficulty, startSailingGame]);
+
   // --- Complete a challenge/leg ---
   const completeChallenge = useCallback(
     (success: boolean, acc: number) => {
@@ -222,12 +292,16 @@ export default function Home() {
           }
         }, success ? 1000 : 1500);
       } else {
-        // Quick play - show feedback overlay
+        // Quick play & wind challenge - show feedback overlay
+        const tip = (screen === "windChallenge" && currentWindChallenge)
+          ? currentWindChallenge.sailingTip
+          : "";
         setFeedback({
           visible: true,
           success,
           message: success ? getSuccessMessage() : getFailMessage(),
           points: pts,
+          sailingTip: tip,
         });
         setScore((prev) => prev + pts);
         setResults((prev) => [...prev, result]);
@@ -251,19 +325,33 @@ export default function Home() {
   // Feedback done - advance to next challenge
   const handleFeedbackDone = useCallback(() => {
     setFeedback((prev) => ({ ...prev, visible: false }));
-    if (challengeIndex < challenges.length - 1) {
-      const nextIdx = challengeIndex + 1;
-      setChallengeIndex(nextIdx);
-      setAccuracy(0);
-      setLocked(false);
-      lockStartRef.current = null;
-      setTimerDuration(challenges[nextIdx].timeLimit);
-      setTimerRunning(true);
+
+    if (gameModeRef.current === "windChallenge") {
+      if (windIndex < windChallenges.length - 1) {
+        const nextIdx = windIndex + 1;
+        setWindIndex(nextIdx);
+        setAccuracy(0);
+        setLocked(false);
+        lockStartRef.current = null;
+        setTimerDuration(windChallenges[nextIdx].timeLimit);
+        setTimerRunning(true);
+      } else {
+        setScreen("results");
+      }
     } else {
-      // Show results after last feedback
-      setScreen("results");
+      if (challengeIndex < challenges.length - 1) {
+        const nextIdx = challengeIndex + 1;
+        setChallengeIndex(nextIdx);
+        setAccuracy(0);
+        setLocked(false);
+        lockStartRef.current = null;
+        setTimerDuration(challenges[nextIdx].timeLimit);
+        setTimerRunning(true);
+      } else {
+        setScreen("results");
+      }
     }
-  }, [challengeIndex, challenges]);
+  }, [challengeIndex, challenges, windIndex, windChallenges]);
 
   // --- Results ---
   const showResults = useCallback(
@@ -281,11 +369,11 @@ export default function Home() {
     []
   );
 
-  // When quick play reaches results screen
+  // When quick play or wind challenge reaches results screen
   useEffect(() => {
     if (
       screen === "results" &&
-      gameModeRef.current === "quickplay" &&
+      (gameModeRef.current === "quickplay" || gameModeRef.current === "windChallenge") &&
       results.length > 0
     ) {
       const s = loadStats();
@@ -303,12 +391,18 @@ export default function Home() {
     if (gameModeRef.current === "voyage" && voyage) {
       return voyage.legs.map((l) => l.name);
     }
+    if (gameModeRef.current === "windChallenge") {
+      return windChallenges.map((wc) => wc.instruction);
+    }
     return challenges.map((c) => c.instruction);
   };
 
   const getMaxPossible = (): number => {
     if (gameModeRef.current === "voyage" && voyage) {
       return voyage.legs.reduce((sum, l) => sum + l.points + 100, 0);
+    }
+    if (gameModeRef.current === "windChallenge") {
+      return windChallenges.reduce((sum, wc) => sum + wc.points + 100, 0);
     }
     return challenges.reduce((sum, c) => sum + c.points + 100, 0);
   };
@@ -380,11 +474,8 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.actions}>
-            <button className={styles.btnPrimary} onClick={startQuickPlay}>
-              Quick Play
-            </button>
-            <button className={styles.btnSecondary} onClick={startVoyage}>
-              Voyage Mode
+            <button className={styles.btnPrimary} onClick={() => setScreen("gameMenu")}>
+              Play
             </button>
             <button
               className={styles.btnOutline}
@@ -394,6 +485,194 @@ export default function Home() {
               }}
             >
               Free Compass
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Game Mode Menu
+  if (screen === "gameMenu") {
+    return (
+      <div className={styles.screen}>
+        <div className={styles.topBar}>
+          <button className={styles.btnIcon} onClick={goHome}>
+            &larr;
+          </button>
+          <span className={styles.topBarTitle}>Select Game Mode</span>
+          <span />
+        </div>
+        <div className={styles.menuContent}>
+          <div
+            className={styles.menuCard}
+            onClick={startQuickPlay}
+          >
+            <div className={styles.menuCardIcon}>&#9978;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Quick Play</h3>
+              <p className={styles.menuCardDesc}>
+                5 compass challenges. Find the correct heading before time runs out!
+              </p>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+
+          <div
+            className={styles.menuCard}
+            onClick={startVoyage}
+          >
+            <div className={styles.menuCardIcon}>&#9971;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Voyage Mode</h3>
+              <p className={styles.menuCardDesc}>
+                Navigate a multi-leg sailing route across the seas.
+              </p>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+
+          <div
+            className={styles.menuCard}
+            onClick={openSailingDifficulty}
+          >
+            <div className={`${styles.menuCardIcon} ${styles.windIcon}`}>&#9973;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Sailing School</h3>
+              <p className={styles.menuCardDesc}>
+                Learn the points of sail! Master ceñida, través, largo and popa.
+              </p>
+              <span className={styles.menuBadge}>NEW</span>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Sailing Difficulty Selector
+  if (screen === "sailingDifficulty") {
+    return (
+      <div className={styles.screen}>
+        <div className={styles.topBar}>
+          <button className={styles.btnIcon} onClick={() => setScreen("gameMenu")}>
+            &larr;
+          </button>
+          <span className={styles.topBarTitle}>Sailing School</span>
+          <span />
+        </div>
+        <div className={styles.menuContent}>
+          <div className={styles.diffHeader}>
+            <div className={styles.diffIcon}>&#9973;</div>
+            <h2 className={styles.diffTitle}>Choose Your Level</h2>
+            <p className={styles.diffSubtitle}>
+              Learn the points of sail at your own pace
+            </p>
+          </div>
+
+          <div
+            className={styles.menuCard}
+            onClick={() => selectSailingDifficulty("beginner")}
+          >
+            <div className={styles.menuCardIcon}>&#127793;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Beginner</h3>
+              <p className={styles.menuCardDesc}>
+                Través (beam reach) &amp; Popa (running). Large tolerance, hints shown.
+              </p>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+
+          <div
+            className={styles.menuCard}
+            onClick={() => selectSailingDifficulty("intermediate")}
+          >
+            <div className={styles.menuCardIcon}>&#9875;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Intermediate</h3>
+              <p className={styles.menuCardDesc}>
+                All 4 points of sail. Moderate tolerance, target bearing shown.
+              </p>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+
+          <div
+            className={styles.menuCard}
+            onClick={() => selectSailingDifficulty("advanced")}
+          >
+            <div className={styles.menuCardIcon}>&#127942;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Advanced</h3>
+              <p className={styles.menuCardDesc}>
+                All points, tight tolerance, no bearing hints. Calculate it yourself!
+              </p>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Sailing Tutorial
+  if (screen === "sailingTutorial") {
+    const step = SAILING_TUTORIAL_STEPS[tutorialStep];
+    const isLast = tutorialStep === SAILING_TUTORIAL_STEPS.length - 1;
+    return (
+      <div className={styles.screen}>
+        <div className={styles.tutorialContent}>
+          <div className={styles.tutorialProgress}>
+            {SAILING_TUTORIAL_STEPS.map((_, i) => (
+              <div
+                key={i}
+                className={`${styles.tutorialDot} ${
+                  i === tutorialStep ? styles.tutorialDotActive : ""
+                } ${i < tutorialStep ? styles.tutorialDotDone : ""}`}
+              />
+            ))}
+          </div>
+          <div className={styles.tutorialIcon}>{step.icon}</div>
+          <h2 className={styles.tutorialTitle}>{step.title}</h2>
+          <p className={styles.tutorialText}>{step.text}</p>
+
+          {tutorialStep === 1 && (
+            <div className={styles.posGrid}>
+              {(Object.keys(POINTS_OF_SAIL) as Array<keyof typeof POINTS_OF_SAIL>).map((key) => {
+                const p = POINTS_OF_SAIL[key];
+                return (
+                  <div key={key} className={styles.posCard}>
+                    <span className={styles.posAngle}>{p.angleFromWind}&deg;</span>
+                    <span className={styles.posName}>{p.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className={styles.tutorialActions}>
+            {tutorialStep > 0 && (
+              <button
+                className={styles.btnOutline}
+                onClick={() => setTutorialStep((s) => s - 1)}
+              >
+                Back
+              </button>
+            )}
+            <button
+              className={styles.btnPrimary}
+              onClick={() => {
+                if (isLast) {
+                  hasSeenTutorialRef.current = true;
+                  startSailingGame(sailingDifficulty);
+                } else {
+                  setTutorialStep((s) => s + 1);
+                }
+              }}
+            >
+              {isLast ? "Start Sailing!" : "Next"}
             </button>
           </div>
         </div>
@@ -522,6 +801,74 @@ export default function Home() {
     );
   }
 
+  // Wind Challenge
+  if (screen === "windChallenge" && currentWindChallenge) {
+    return (
+      <div className={styles.screen}>
+        <div className={styles.topBar}>
+          <button
+            className={styles.btnIcon}
+            onClick={() => {
+              if (confirm("Quit this challenge? Progress will be lost.")) goHome();
+            }}
+          >
+            &larr;
+          </button>
+          <TimerBar
+            duration={timerDuration}
+            running={timerRunning}
+            onComplete={handleTimerComplete}
+            onTick={handleTimerTick}
+          />
+          <div className={styles.scoreDisplay}>
+            <span>{score}</span> pts
+          </div>
+        </div>
+
+        <div className={styles.challengeHeader}>
+          <div className={styles.windInfoBar}>
+            <span className={styles.windInfoIcon}>&#127788;&#65039;</span>
+            <span className={styles.windInfoText}>
+              Wind from <strong>{currentWindChallenge.windLabel}</strong>
+            </span>
+            <span className={styles.windInfoOffset}>
+              {currentWindChallenge.tack === "starboard" ? "Starboard" : "Port"} tack
+            </span>
+          </div>
+          <div className={styles.instruction}>{currentWindChallenge.instruction}</div>
+          <div className={styles.detail}>{currentWindChallenge.detail}</div>
+          <div className={styles.posBadge}>
+            {POINTS_OF_SAIL[currentWindChallenge.pointOfSail].angleFromWind}&deg; from wind
+          </div>
+          <div className={styles.counter}>
+            {windIndex + 1} / {windChallenges.length}
+          </div>
+        </div>
+
+        <CompassRose
+          heading={compass.heading}
+          targetBearing={windTarget}
+          showTarget
+          locked={locked}
+          windMode
+          windDirection={currentWindChallenge.windDirection}
+          destinationBearing={currentWindChallenge.targetBearing}
+        />
+
+        <AccuracyMeter accuracy={accuracy} label="On Course" />
+
+        <Feedback
+          visible={feedback.visible}
+          success={feedback.success}
+          message={feedback.message}
+          points={feedback.points}
+          onDone={handleFeedbackDone}
+          sailingTip={feedback.sailingTip}
+        />
+      </div>
+    );
+  }
+
   // Results
   if (screen === "results") {
     const labels = getLabels();
@@ -533,6 +880,8 @@ export default function Home() {
             <h2>
               {gameModeRef.current === "voyage" && voyage
                 ? `${voyage.name} Complete!`
+                : gameModeRef.current === "windChallenge"
+                ? "Sailing Lesson Complete!"
                 : "Challenge Complete!"}
             </h2>
           </div>
@@ -570,7 +919,11 @@ export default function Home() {
             <button
               className={styles.btnPrimary}
               onClick={
-                gameModeRef.current === "voyage" ? startVoyage : startQuickPlay
+                gameModeRef.current === "voyage"
+                  ? startVoyage
+                  : gameModeRef.current === "windChallenge"
+                  ? startWindChallenge
+                  : startQuickPlay
               }
             >
               Play Again
