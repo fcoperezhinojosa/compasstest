@@ -1,0 +1,324 @@
+/* === Screen base === */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: #0a1628;
+  color: #e8f0ff;
+}
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 2rem;
+  text-align: center;
+}
+
+.phoneIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.compassIconLarge {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+}
+
+.compassIconAnimated {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  animation: pulseRotate 4s ease-in-out infinite;
+}
+
+@keyframes pulseRotate {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(10deg) scale(1.05); }
+  50% { transform: rotate(0deg) scale(1); }
+  75% { transform: rotate(-10deg) scale(1.05); }
+}
+
+.titleGradient {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  background: linear-gradient(135deg, #00d4ff, #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.titleAccent {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #00d4ff;
+}
+
+.subtitle {
+  color: #8899bb;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dim {
+  color: #556688;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+/* === Buttons === */
+.btnPrimary,
+.btnSecondary,
+.btnOutline {
+  display: block;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btnPrimary + .btnPrimary,
+.btnPrimary + .btnSecondary,
+.btnPrimary + .btnOutline,
+.btnSecondary + .btnPrimary,
+.btnSecondary + .btnSecondary,
+.btnSecondary + .btnOutline,
+.btnOutline + .btnPrimary,
+.btnOutline + .btnSecondary,
+.btnOutline + .btnOutline {
+  margin-top: 0.75rem;
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, #00d4ff, #0088cc);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.btnPrimary:active { transform: scale(0.97); }
+
+.btnSecondary {
+  background: linear-gradient(135deg, #ffd700, #cc9900);
+  color: #1a1a2e;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.btnSecondary:active { transform: scale(0.97); }
+
+.btnOutline {
+  background: transparent;
+  color: #8899bb;
+  border: 2px solid #556688;
+}
+
+.btnOutline:active { background: #111d35; }
+
+.btnIcon {
+  background: none;
+  border: none;
+  color: #e8f0ff;
+  font-size: 1.5rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* === Home === */
+.homeContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  padding: 2rem 1.5rem;
+  gap: 2rem;
+}
+
+.homeHeader {
+  text-align: center;
+}
+
+.statsRow {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.statBox {
+  flex: 1;
+  background: #111d35;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.statValue {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #00d4ff;
+}
+
+.statLabel {
+  display: block;
+  font-size: 0.75rem;
+  color: #556688;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
+.actions {
+  width: 100%;
+}
+
+/* === Top Bar === */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #111d35;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+.topBarTitle {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.scoreDisplay {
+  font-weight: 700;
+  color: #ffd700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* === Challenge Header === */
+.challengeHeader {
+  text-align: center;
+  padding: 1rem 1.5rem 0.5rem;
+  flex-shrink: 0;
+}
+
+.instruction {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.detail {
+  color: #8899bb;
+  font-size: 0.9rem;
+}
+
+.counter {
+  color: #556688;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.voyageLegLabel {
+  color: #556688;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+/* === Results === */
+.resultsContent {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.resultsHeader {
+  margin-bottom: 1.5rem;
+}
+
+.resultsIcon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.resultsHeader h2 {
+  font-size: 1.5rem;
+  color: #e8f0ff;
+}
+
+.resultsScore {
+  margin-bottom: 1rem;
+}
+
+.resultsScoreValue {
+  display: block;
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.resultsScoreLabel {
+  color: #556688;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stars {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.25rem;
+}
+
+.breakdown {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.resultRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  background: #111d35;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.resultLabel {
+  color: #8899bb;
+  font-size: 0.9rem;
+}
+
+.resultValue {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.successText {
+  color: #00ff88;
+}
+
+.failText {
+  color: #ff4466;
+}

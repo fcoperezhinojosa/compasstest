@@ -1,0 +1,225 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 1rem;
+  min-height: 0;
+}
+
+.compact {
+  flex: 0.7;
+}
+
+.frame {
+  position: relative;
+  width: min(75vw, 300px);
+  height: min(75vw, 300px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #162544, #0a1628);
+  border: 3px solid #0088aa;
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s;
+}
+
+.locked {
+  border-color: #00ff88;
+  animation: compassLock 1s ease-in-out;
+}
+
+@keyframes compassLock {
+  0% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.5); }
+  50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.3); }
+  100% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.5); }
+}
+
+.rose {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  transition: transform 0.15s ease-out;
+}
+
+.dial {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cardinal,
+.intercardinal {
+  position: absolute;
+  font-weight: 700;
+  transform: translate(-50%, -50%);
+}
+
+.cardinal {
+  font-size: 1.2rem;
+}
+
+.north {
+  top: 8%;
+  left: 50%;
+  color: #ff3344;
+  font-size: 1.4rem;
+}
+
+.south {
+  bottom: 4%;
+  left: 50%;
+  top: auto;
+  transform: translate(-50%, 0);
+  color: #8899bb;
+}
+
+.east {
+  right: 4%;
+  top: 50%;
+  left: auto;
+  transform: translate(0, -50%);
+  color: #8899bb;
+}
+
+.west {
+  left: 8%;
+  top: 50%;
+  color: #8899bb;
+}
+
+.intercardinal {
+  font-size: 0.7rem;
+  color: #556688;
+}
+
+.ne { top: 18%; right: 14%; left: auto; transform: translate(0, 0); }
+.se { bottom: 18%; right: 14%; left: auto; top: auto; transform: translate(0, 0); }
+.sw { bottom: 18%; left: 14%; top: auto; transform: translate(0, 0); }
+.nw { top: 18%; left: 14%; transform: translate(0, 0); }
+
+.tickMarks {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.tickMarks::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(#556688 0deg 0.5deg, transparent 0.5deg 10deg);
+  mask: radial-gradient(transparent 85%, black 86%, black 95%, transparent 96%);
+  -webkit-mask: radial-gradient(transparent 85%, black 86%, black 95%, transparent 96%);
+  opacity: 0.5;
+}
+
+.needle {
+  position: absolute;
+  width: 4px;
+  height: 45%;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.needle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 30px solid #ff3344;
+  filter: drop-shadow(0 0 6px rgba(255, 51, 68, 0.5));
+}
+
+.needle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 25px solid #f0f4ff;
+  filter: drop-shadow(0 0 4px rgba(240, 244, 255, 0.3));
+}
+
+.centerDot {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #e8f0ff;
+  border-radius: 50%;
+  border: 2px solid #00d4ff;
+  z-index: 6;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.targetIndicator {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  z-index: 2;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.active {
+  border-top-color: #ffd700;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.3));
+  animation: targetPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes targetPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.bearingDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15rem;
+  margin-top: 1rem;
+}
+
+.bearingValue {
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #00d4ff;
+}
+
+.bearingUnit {
+  font-size: 1.5rem;
+  color: #0088aa;
+}
+
+@media (max-height: 600px) {
+  .frame {
+    width: min(55vw, 220px);
+    height: min(55vw, 220px);
+  }
+  .bearingValue { font-size: 2rem; }
+}
+
+@media (max-height: 500px) {
+  .frame {
+    width: min(45vw, 180px);
+    height: min(45vw, 180px);
+  }
+  .cardinal { font-size: 0.9rem; }
+  .north { font-size: 1.1rem; }
+}
