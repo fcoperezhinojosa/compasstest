@@ -176,91 +176,209 @@ export function getFailMessage(): string {
   return messages[Math.floor(Math.random() * messages.length)];
 }
 
-// ========================
-// WIND CHALLENGE MODE
-// ========================
+// =========================================
+// SAILING SCHOOL MODE (Educational)
+// Based on: "Diseño de un juego móvil educativo
+// de navegación a vela" pedagogical framework
+// =========================================
+
+export type SailingDifficulty = "beginner" | "intermediate" | "advanced";
+
+export type PointOfSail =
+  | "ceñida"     // Close-hauled ~45° from wind
+  | "través"     // Beam reach ~90° from wind
+  | "largo"      // Broad reach ~135° from wind
+  | "popa";      // Running ~180° from wind
+
+export interface PointOfSailInfo {
+  name: PointOfSail;
+  label: string;           // English display name
+  angleFromWind: number;   // Angle relative to wind source
+  description: string;     // What this point of sail means
+  tip: string;             // Educational tip shown after challenge
+}
+
+export const POINTS_OF_SAIL: Record<PointOfSail, PointOfSailInfo> = {
+  "ceñida": {
+    name: "ceñida",
+    label: "Close-Hauled (Ceñida)",
+    angleFromWind: 45,
+    description: "Sailing as close to the wind as possible (~45°). Requires zigzag tacking to go upwind.",
+    tip: "Close-hauled (ceñida) is the closest angle you can sail toward the wind. Sailors zigzag (tack) to travel upwind since you can't sail directly into the wind!",
+  },
+  "través": {
+    name: "través",
+    label: "Beam Reach (Través)",
+    angleFromWind: 90,
+    description: "Wind blows from the side (~90°). Good speed and stability.",
+    tip: "Beam reach (través) means the wind hits your boat from the side at 90°. This is often the fastest and most stable point of sail!",
+  },
+  "largo": {
+    name: "largo",
+    label: "Broad Reach (Largo)",
+    angleFromWind: 135,
+    description: "Wind comes from behind at an angle (~135°). Fast sailing.",
+    tip: "Broad reach (largo) is sailing with the wind coming from behind at an angle. It's fast sailing — but watch for an accidental jibe (trasluchada)!",
+  },
+  "popa": {
+    name: "popa",
+    label: "Running (Popa)",
+    angleFromWind: 180,
+    description: "Wind blows directly from behind (~180°). Less speed from sail lift.",
+    tip: "Running (popa) means the wind pushes from directly behind. The sails can't generate lift, so speed is actually lower than a broad reach. Be careful of jibing!",
+  },
+};
 
 export interface WindChallenge {
-  destination: string;
-  destinationBearing: number;
-  windDirection: number; // where the wind blows FROM (degrees)
+  pointOfSail: PointOfSail;
+  windDirection: number;     // absolute degrees where wind blows FROM
   windLabel: string;
-  windOffset: number; // how many degrees to compensate
+  targetBearing: number;     // absolute bearing the player must achieve
+  tack: "starboard" | "port"; // which side the wind hits
   timeLimit: number;
   threshold: number;
   points: number;
   instruction: string;
   detail: string;
+  sailingTip: string;        // educational tip shown after challenge
+  difficulty: SailingDifficulty;
 }
-
-const DIRECTION_NAMES: Record<number, string> = {
-  0: "North",
-  45: "Northeast",
-  90: "East",
-  135: "Southeast",
-  180: "South",
-  225: "Southwest",
-  270: "West",
-  315: "Northwest",
-};
 
 function normalizeAngle(angle: number): number {
   return ((angle % 360) + 360) % 360;
 }
 
+const DIRECTION_NAMES: Record<number, string> = {
+  0: "North", 45: "Northeast", 90: "East", 135: "Southeast",
+  180: "South", 225: "Southwest", 270: "West", 315: "Northwest",
+};
+
 function getWindLabel(deg: number): string {
   return DIRECTION_NAMES[normalizeAngle(deg)] || `${normalizeAngle(deg)}°`;
 }
 
-export function generateWindChallenge(): WindChallenge {
-  // Pick a random destination from 8 compass points
-  const destinations = [0, 45, 90, 135, 180, 225, 270, 315];
-  const destBearing = destinations[Math.floor(Math.random() * destinations.length)];
-  const destName = DIRECTION_NAMES[destBearing];
+// Difficulty settings
+const DIFFICULTY_CONFIG: Record<SailingDifficulty, {
+  points: PointOfSail[];
+  threshold: number;
+  timeLimit: number;
+  basePoints: number;
+  showTarget: boolean;   // whether to show the exact target bearing as hint
+}> = {
+  beginner: {
+    points: ["través", "popa"],
+    threshold: 20,
+    timeLimit: 20,
+    basePoints: 150,
+    showTarget: true,
+  },
+  intermediate: {
+    points: ["ceñida", "través", "largo", "popa"],
+    threshold: 15,
+    timeLimit: 15,
+    basePoints: 200,
+    showTarget: true,
+  },
+  advanced: {
+    points: ["ceñida", "través", "largo", "popa"],
+    threshold: 10,
+    timeLimit: 12,
+    basePoints: 250,
+    showTarget: false,
+  },
+};
 
-  // Pick a random wind direction (from one of 8 directions), avoid same as destination
-  let windFrom: number;
-  do {
-    windFrom = destinations[Math.floor(Math.random() * destinations.length)];
-  } while (windFrom === destBearing);
+export function generateWindChallenge(difficulty: SailingDifficulty = "beginner"): WindChallenge {
+  const config = DIFFICULTY_CONFIG[difficulty];
 
-  // Wind offset: the player must steer INTO the wind to compensate
-  // Wind pushes you away from where it's blowing FROM, so compensate towards the wind
-  const offsets = [15, 20, 25, 30];
-  const windOffset = offsets[Math.floor(Math.random() * offsets.length)];
+  // Random wind direction from 8 compass points
+  const windDirs = [0, 45, 90, 135, 180, 225, 270, 315];
+  const windFrom = windDirs[Math.floor(Math.random() * windDirs.length)];
 
-  // Calculate the actual target: steer into the wind
-  // If wind blows from the left of your course, steer left (into the wind)
-  const windAngleDiff = angleDifference(destBearing, windFrom);
-  // If wind comes from the right (positive diff), steer right (add offset toward wind)
-  // If wind comes from the left (negative diff), steer left (subtract offset toward wind)
-  const compensationDirection = windAngleDiff > 0 ? 1 : -1;
-  const actualTarget = normalizeAngle(destBearing + compensationDirection * windOffset);
+  // Random point of sail for this difficulty
+  const pos = config.points[Math.floor(Math.random() * config.points.length)];
+  const posInfo = POINTS_OF_SAIL[pos];
+
+  // Random tack (starboard or port)
+  const tack: "starboard" | "port" = Math.random() > 0.5 ? "starboard" : "port";
+
+  // Calculate target bearing:
+  // Wind FROM windFrom means wind blows toward (windFrom + 180)
+  // Starboard tack: wind hits right side → boat heading = windFrom + angle
+  // Port tack: wind hits left side → boat heading = windFrom - angle
+  // For popa (180°), both tacks give same result
+  const angleOffset = posInfo.angleFromWind;
+  const targetBearing = normalizeAngle(
+    tack === "starboard"
+      ? windFrom + angleOffset
+      : windFrom - angleOffset
+  );
+
+  // Build the instruction text
+  const tackLabel = tack === "starboard" ? "starboard tack" : "port tack";
+  const targetHint = config.showTarget ? ` → ${Math.round(targetBearing)}°` : "";
+  const windName = getWindLabel(windFrom);
 
   return {
-    destination: destName,
-    destinationBearing: destBearing,
+    pointOfSail: pos,
     windDirection: windFrom,
-    windLabel: getWindLabel(windFrom),
-    windOffset,
-    timeLimit: 15,
-    threshold: 15,
-    points: 200,
-    instruction: `Sail ${destName}!`,
-    detail: `Wind from ${getWindLabel(windFrom)} — compensate ${windOffset}° into the wind`,
+    windLabel: windName,
+    targetBearing,
+    tack,
+    timeLimit: config.timeLimit,
+    threshold: config.threshold,
+    points: config.basePoints,
+    instruction: `Sail ${posInfo.label}!`,
+    detail: `Wind from ${windName} — ${tackLabel}${targetHint}`,
+    sailingTip: posInfo.tip,
+    difficulty,
   };
 }
 
-export function generateWindChallenges(count = 5): WindChallenge[] {
+export function generateWindChallenges(
+  count = 5,
+  difficulty: SailingDifficulty = "beginner"
+): WindChallenge[] {
   const challenges: WindChallenge[] = [];
+  // Ensure variety: try not to repeat the same point of sail consecutively
+  let lastPos: PointOfSail | null = null;
   for (let i = 0; i < count; i++) {
-    challenges.push(generateWindChallenge());
+    let ch: WindChallenge;
+    let attempts = 0;
+    do {
+      ch = generateWindChallenge(difficulty);
+      attempts++;
+    } while (ch.pointOfSail === lastPos && attempts < 10);
+    lastPos = ch.pointOfSail;
+    challenges.push(ch);
   }
   return challenges;
 }
 
 export function getWindTarget(challenge: WindChallenge): number {
-  const windAngleDiff = angleDifference(challenge.destinationBearing, challenge.windDirection);
-  const compensationDirection = windAngleDiff > 0 ? 1 : -1;
-  return normalizeAngle(challenge.destinationBearing + compensationDirection * challenge.windOffset);
+  return challenge.targetBearing;
 }
+
+// Tutorial content for the sailing school
+export const SAILING_TUTORIAL_STEPS = [
+  {
+    icon: "💨",
+    title: "Read the Wind",
+    text: "The cyan arrow on the compass shows where the wind blows FROM. Reading the wind is the first skill every sailor learns.",
+  },
+  {
+    icon: "⛵",
+    title: "Points of Sail",
+    text: "Your angle relative to the wind determines your 'point of sail': Ceñida (45°), Través (90°), Largo (135°), or Popa (180°).",
+  },
+  {
+    icon: "🧭",
+    title: "Find the Heading",
+    text: "Calculate the correct bearing from the wind direction + point of sail angle, then rotate your device to match!",
+  },
+  {
+    icon: "⭐",
+    title: "Hold Steady",
+    text: "Keep your heading steady for 1.2 seconds to lock in. Accuracy and speed earn bonus points. Good luck, Captain!",
+  },
+];

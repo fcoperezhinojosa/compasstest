@@ -12,6 +12,7 @@ import {
   ChallengeResult,
   VoyageRoute,
   WindChallenge,
+  SailingDifficulty,
   generateQuickPlay,
   getRandomVoyage,
   generateWindChallenges,
@@ -24,6 +25,8 @@ import {
   saveStats,
   getSuccessMessage,
   getFailMessage,
+  SAILING_TUTORIAL_STEPS,
+  POINTS_OF_SAIL,
 } from "@/lib/challenges";
 import styles from "./page.module.css";
 
@@ -35,6 +38,8 @@ type Screen =
   | "freeCompass"
   | "quickplay"
   | "voyage"
+  | "sailingDifficulty"
+  | "sailingTutorial"
   | "windChallenge"
   | "results";
 
@@ -64,6 +69,7 @@ export default function Home() {
     success: false,
     message: "",
     points: 0,
+    sailingTip: "",
   });
 
   // Voyage state
@@ -71,9 +77,12 @@ export default function Home() {
   const [voyageLeg, setVoyageLeg] = useState(0);
   const [voyageCompleted, setVoyageCompleted] = useState<boolean[]>([]);
 
-  // Wind challenge state
+  // Wind / Sailing School state
   const [windChallenges, setWindChallenges] = useState<WindChallenge[]>([]);
   const [windIndex, setWindIndex] = useState(0);
+  const [sailingDifficulty, setSailingDifficulty] = useState<SailingDifficulty>("beginner");
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const hasSeenTutorialRef = useRef(false);
 
   // Game mode ref for results
   const gameModeRef = useRef<"quickplay" | "voyage" | "windChallenge">("quickplay");
@@ -204,10 +213,24 @@ export default function Home() {
     setScreen("voyage");
   }, []);
 
-  // --- Wind Challenge ---
-  const startWindChallenge = useCallback(() => {
+  // --- Sailing School ---
+  const openSailingDifficulty = useCallback(() => {
+    setScreen("sailingDifficulty");
+  }, []);
+
+  const selectSailingDifficulty = useCallback((diff: SailingDifficulty) => {
+    setSailingDifficulty(diff);
+    if (!hasSeenTutorialRef.current) {
+      setTutorialStep(0);
+      setScreen("sailingTutorial");
+    } else {
+      startSailingGame(diff);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const startSailingGame = useCallback((diff: SailingDifficulty) => {
     gameModeRef.current = "windChallenge";
-    const wc = generateWindChallenges(5);
+    const wc = generateWindChallenges(5, diff);
     setWindChallenges(wc);
     setWindIndex(0);
     setScore(0);
@@ -219,6 +242,10 @@ export default function Home() {
     setTimerRunning(true);
     setScreen("windChallenge");
   }, []);
+
+  const startWindChallenge = useCallback(() => {
+    startSailingGame(sailingDifficulty);
+  }, [sailingDifficulty, startSailingGame]);
 
   // --- Complete a challenge/leg ---
   const completeChallenge = useCallback(
@@ -266,11 +293,15 @@ export default function Home() {
         }, success ? 1000 : 1500);
       } else {
         // Quick play & wind challenge - show feedback overlay
+        const tip = (screen === "windChallenge" && currentWindChallenge)
+          ? currentWindChallenge.sailingTip
+          : "";
         setFeedback({
           visible: true,
           success,
           message: success ? getSuccessMessage() : getFailMessage(),
           points: pts,
+          sailingTip: tip,
         });
         setScore((prev) => prev + pts);
         setResults((prev) => [...prev, result]);
@@ -503,17 +534,146 @@ export default function Home() {
 
           <div
             className={styles.menuCard}
-            onClick={startWindChallenge}
+            onClick={openSailingDifficulty}
           >
             <div className={`${styles.menuCardIcon} ${styles.windIcon}`}>&#9973;</div>
             <div className={styles.menuCardBody}>
-              <h3 className={styles.menuCardTitle}>Wind Challenge</h3>
+              <h3 className={styles.menuCardTitle}>Sailing School</h3>
               <p className={styles.menuCardDesc}>
-                Sail with the wind! Compensate for wind drift to reach your destination.
+                Learn the points of sail! Master ceñida, través, largo and popa.
               </p>
               <span className={styles.menuBadge}>NEW</span>
             </div>
             <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Sailing Difficulty Selector
+  if (screen === "sailingDifficulty") {
+    return (
+      <div className={styles.screen}>
+        <div className={styles.topBar}>
+          <button className={styles.btnIcon} onClick={() => setScreen("gameMenu")}>
+            &larr;
+          </button>
+          <span className={styles.topBarTitle}>Sailing School</span>
+          <span />
+        </div>
+        <div className={styles.menuContent}>
+          <div className={styles.diffHeader}>
+            <div className={styles.diffIcon}>&#9973;</div>
+            <h2 className={styles.diffTitle}>Choose Your Level</h2>
+            <p className={styles.diffSubtitle}>
+              Learn the points of sail at your own pace
+            </p>
+          </div>
+
+          <div
+            className={styles.menuCard}
+            onClick={() => selectSailingDifficulty("beginner")}
+          >
+            <div className={styles.menuCardIcon}>&#127793;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Beginner</h3>
+              <p className={styles.menuCardDesc}>
+                Través (beam reach) &amp; Popa (running). Large tolerance, hints shown.
+              </p>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+
+          <div
+            className={styles.menuCard}
+            onClick={() => selectSailingDifficulty("intermediate")}
+          >
+            <div className={styles.menuCardIcon}>&#9875;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Intermediate</h3>
+              <p className={styles.menuCardDesc}>
+                All 4 points of sail. Moderate tolerance, target bearing shown.
+              </p>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+
+          <div
+            className={styles.menuCard}
+            onClick={() => selectSailingDifficulty("advanced")}
+          >
+            <div className={styles.menuCardIcon}>&#127942;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Advanced</h3>
+              <p className={styles.menuCardDesc}>
+                All points, tight tolerance, no bearing hints. Calculate it yourself!
+              </p>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Sailing Tutorial
+  if (screen === "sailingTutorial") {
+    const step = SAILING_TUTORIAL_STEPS[tutorialStep];
+    const isLast = tutorialStep === SAILING_TUTORIAL_STEPS.length - 1;
+    return (
+      <div className={styles.screen}>
+        <div className={styles.tutorialContent}>
+          <div className={styles.tutorialProgress}>
+            {SAILING_TUTORIAL_STEPS.map((_, i) => (
+              <div
+                key={i}
+                className={`${styles.tutorialDot} ${
+                  i === tutorialStep ? styles.tutorialDotActive : ""
+                } ${i < tutorialStep ? styles.tutorialDotDone : ""}`}
+              />
+            ))}
+          </div>
+          <div className={styles.tutorialIcon}>{step.icon}</div>
+          <h2 className={styles.tutorialTitle}>{step.title}</h2>
+          <p className={styles.tutorialText}>{step.text}</p>
+
+          {tutorialStep === 1 && (
+            <div className={styles.posGrid}>
+              {(Object.keys(POINTS_OF_SAIL) as Array<keyof typeof POINTS_OF_SAIL>).map((key) => {
+                const p = POINTS_OF_SAIL[key];
+                return (
+                  <div key={key} className={styles.posCard}>
+                    <span className={styles.posAngle}>{p.angleFromWind}&deg;</span>
+                    <span className={styles.posName}>{p.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className={styles.tutorialActions}>
+            {tutorialStep > 0 && (
+              <button
+                className={styles.btnOutline}
+                onClick={() => setTutorialStep((s) => s - 1)}
+              >
+                Back
+              </button>
+            )}
+            <button
+              className={styles.btnPrimary}
+              onClick={() => {
+                if (isLast) {
+                  hasSeenTutorialRef.current = true;
+                  startSailingGame(sailingDifficulty);
+                } else {
+                  setTutorialStep((s) => s + 1);
+                }
+              }}
+            >
+              {isLast ? "Start Sailing!" : "Next"}
+            </button>
           </div>
         </div>
       </div>
@@ -672,11 +832,14 @@ export default function Home() {
               Wind from <strong>{currentWindChallenge.windLabel}</strong>
             </span>
             <span className={styles.windInfoOffset}>
-              Compensate {currentWindChallenge.windOffset}&deg;
+              {currentWindChallenge.tack === "starboard" ? "Starboard" : "Port"} tack
             </span>
           </div>
           <div className={styles.instruction}>{currentWindChallenge.instruction}</div>
           <div className={styles.detail}>{currentWindChallenge.detail}</div>
+          <div className={styles.posBadge}>
+            {POINTS_OF_SAIL[currentWindChallenge.pointOfSail].angleFromWind}&deg; from wind
+          </div>
           <div className={styles.counter}>
             {windIndex + 1} / {windChallenges.length}
           </div>
@@ -689,7 +852,7 @@ export default function Home() {
           locked={locked}
           windMode
           windDirection={currentWindChallenge.windDirection}
-          destinationBearing={currentWindChallenge.destinationBearing}
+          destinationBearing={currentWindChallenge.targetBearing}
         />
 
         <AccuracyMeter accuracy={accuracy} label="On Course" />
@@ -700,6 +863,7 @@ export default function Home() {
           message={feedback.message}
           points={feedback.points}
           onDone={handleFeedbackDone}
+          sailingTip={feedback.sailingTip}
         />
       </div>
     );
@@ -717,7 +881,7 @@ export default function Home() {
               {gameModeRef.current === "voyage" && voyage
                 ? `${voyage.name} Complete!`
                 : gameModeRef.current === "windChallenge"
-                ? "Wind Challenge Complete!"
+                ? "Sailing Lesson Complete!"
                 : "Challenge Complete!"}
             </h2>
           </div>
