@@ -175,3 +175,92 @@ export function getFailMessage(): string {
   ];
   return messages[Math.floor(Math.random() * messages.length)];
 }
+
+// ========================
+// WIND CHALLENGE MODE
+// ========================
+
+export interface WindChallenge {
+  destination: string;
+  destinationBearing: number;
+  windDirection: number; // where the wind blows FROM (degrees)
+  windLabel: string;
+  windOffset: number; // how many degrees to compensate
+  timeLimit: number;
+  threshold: number;
+  points: number;
+  instruction: string;
+  detail: string;
+}
+
+const DIRECTION_NAMES: Record<number, string> = {
+  0: "North",
+  45: "Northeast",
+  90: "East",
+  135: "Southeast",
+  180: "South",
+  225: "Southwest",
+  270: "West",
+  315: "Northwest",
+};
+
+function normalizeAngle(angle: number): number {
+  return ((angle % 360) + 360) % 360;
+}
+
+function getWindLabel(deg: number): string {
+  return DIRECTION_NAMES[normalizeAngle(deg)] || `${normalizeAngle(deg)}°`;
+}
+
+export function generateWindChallenge(): WindChallenge {
+  // Pick a random destination from 8 compass points
+  const destinations = [0, 45, 90, 135, 180, 225, 270, 315];
+  const destBearing = destinations[Math.floor(Math.random() * destinations.length)];
+  const destName = DIRECTION_NAMES[destBearing];
+
+  // Pick a random wind direction (from one of 8 directions), avoid same as destination
+  let windFrom: number;
+  do {
+    windFrom = destinations[Math.floor(Math.random() * destinations.length)];
+  } while (windFrom === destBearing);
+
+  // Wind offset: the player must steer INTO the wind to compensate
+  // Wind pushes you away from where it's blowing FROM, so compensate towards the wind
+  const offsets = [15, 20, 25, 30];
+  const windOffset = offsets[Math.floor(Math.random() * offsets.length)];
+
+  // Calculate the actual target: steer into the wind
+  // If wind blows from the left of your course, steer left (into the wind)
+  const windAngleDiff = angleDifference(destBearing, windFrom);
+  // If wind comes from the right (positive diff), steer right (add offset toward wind)
+  // If wind comes from the left (negative diff), steer left (subtract offset toward wind)
+  const compensationDirection = windAngleDiff > 0 ? 1 : -1;
+  const actualTarget = normalizeAngle(destBearing + compensationDirection * windOffset);
+
+  return {
+    destination: destName,
+    destinationBearing: destBearing,
+    windDirection: windFrom,
+    windLabel: getWindLabel(windFrom),
+    windOffset,
+    timeLimit: 15,
+    threshold: 15,
+    points: 200,
+    instruction: `Sail ${destName}!`,
+    detail: `Wind from ${getWindLabel(windFrom)} — compensate ${windOffset}° into the wind`,
+  };
+}
+
+export function generateWindChallenges(count = 5): WindChallenge[] {
+  const challenges: WindChallenge[] = [];
+  for (let i = 0; i < count; i++) {
+    challenges.push(generateWindChallenge());
+  }
+  return challenges;
+}
+
+export function getWindTarget(challenge: WindChallenge): number {
+  const windAngleDiff = angleDifference(challenge.destinationBearing, challenge.windDirection);
+  const compensationDirection = windAngleDiff > 0 ? 1 : -1;
+  return normalizeAngle(challenge.destinationBearing + compensationDirection * challenge.windOffset);
+}

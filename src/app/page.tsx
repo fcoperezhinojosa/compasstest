@@ -11,8 +11,11 @@ import {
   Challenge,
   ChallengeResult,
   VoyageRoute,
+  WindChallenge,
   generateQuickPlay,
   getRandomVoyage,
+  generateWindChallenges,
+  getWindTarget,
   calculateAccuracy,
   isOnTarget,
   calculateBonus,
@@ -28,9 +31,11 @@ type Screen =
   | "desktop"
   | "permission"
   | "home"
+  | "gameMenu"
   | "freeCompass"
   | "quickplay"
   | "voyage"
+  | "windChallenge"
   | "results";
 
 const LOCK_DURATION = 1200;
@@ -66,8 +71,12 @@ export default function Home() {
   const [voyageLeg, setVoyageLeg] = useState(0);
   const [voyageCompleted, setVoyageCompleted] = useState<boolean[]>([]);
 
+  // Wind challenge state
+  const [windChallenges, setWindChallenges] = useState<WindChallenge[]>([]);
+  const [windIndex, setWindIndex] = useState(0);
+
   // Game mode ref for results
-  const gameModeRef = useRef<"quickplay" | "voyage">("quickplay");
+  const gameModeRef = useRef<"quickplay" | "voyage" | "windChallenge">("quickplay");
 
   // --- Init ---
   useEffect(() => {
@@ -91,11 +100,29 @@ export default function Home() {
   }, [compass.isMobile, compass.isSupported]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // --- Compass heading handler for challenges ---
+  // For wind challenges, build a Challenge-like object from WindChallenge
+  const currentWindChallenge =
+    screen === "windChallenge" && windChallenges[windIndex]
+      ? windChallenges[windIndex]
+      : null;
+
+  const windTarget = currentWindChallenge ? getWindTarget(currentWindChallenge) : 0;
+
   const currentChallenge =
     screen === "quickplay" && challenges[challengeIndex]
       ? challenges[challengeIndex]
       : screen === "voyage" && voyage
       ? voyage.legs[voyageLeg]
+      : screen === "windChallenge" && currentWindChallenge
+      ? {
+          type: "wind",
+          target: windTarget,
+          instruction: currentWindChallenge.instruction,
+          detail: currentWindChallenge.detail,
+          timeLimit: currentWindChallenge.timeLimit,
+          threshold: currentWindChallenge.threshold,
+          points: currentWindChallenge.points,
+        } as Challenge
       : null;
 
   useEffect(() => {
@@ -177,6 +204,22 @@ export default function Home() {
     setScreen("voyage");
   }, []);
 
+  // --- Wind Challenge ---
+  const startWindChallenge = useCallback(() => {
+    gameModeRef.current = "windChallenge";
+    const wc = generateWindChallenges(5);
+    setWindChallenges(wc);
+    setWindIndex(0);
+    setScore(0);
+    setResults([]);
+    setAccuracy(0);
+    setLocked(false);
+    lockStartRef.current = null;
+    setTimerDuration(wc[0].timeLimit);
+    setTimerRunning(true);
+    setScreen("windChallenge");
+  }, []);
+
   // --- Complete a challenge/leg ---
   const completeChallenge = useCallback(
     (success: boolean, acc: number) => {
@@ -222,7 +265,7 @@ export default function Home() {
           }
         }, success ? 1000 : 1500);
       } else {
-        // Quick play - show feedback overlay
+        // Quick play & wind challenge - show feedback overlay
         setFeedback({
           visible: true,
           success,
@@ -251,19 +294,33 @@ export default function Home() {
   // Feedback done - advance to next challenge
   const handleFeedbackDone = useCallback(() => {
     setFeedback((prev) => ({ ...prev, visible: false }));
-    if (challengeIndex < challenges.length - 1) {
-      const nextIdx = challengeIndex + 1;
-      setChallengeIndex(nextIdx);
-      setAccuracy(0);
-      setLocked(false);
-      lockStartRef.current = null;
-      setTimerDuration(challenges[nextIdx].timeLimit);
-      setTimerRunning(true);
+
+    if (gameModeRef.current === "windChallenge") {
+      if (windIndex < windChallenges.length - 1) {
+        const nextIdx = windIndex + 1;
+        setWindIndex(nextIdx);
+        setAccuracy(0);
+        setLocked(false);
+        lockStartRef.current = null;
+        setTimerDuration(windChallenges[nextIdx].timeLimit);
+        setTimerRunning(true);
+      } else {
+        setScreen("results");
+      }
     } else {
-      // Show results after last feedback
-      setScreen("results");
+      if (challengeIndex < challenges.length - 1) {
+        const nextIdx = challengeIndex + 1;
+        setChallengeIndex(nextIdx);
+        setAccuracy(0);
+        setLocked(false);
+        lockStartRef.current = null;
+        setTimerDuration(challenges[nextIdx].timeLimit);
+        setTimerRunning(true);
+      } else {
+        setScreen("results");
+      }
     }
-  }, [challengeIndex, challenges]);
+  }, [challengeIndex, challenges, windIndex, windChallenges]);
 
   // --- Results ---
   const showResults = useCallback(
@@ -281,11 +338,11 @@ export default function Home() {
     []
   );
 
-  // When quick play reaches results screen
+  // When quick play or wind challenge reaches results screen
   useEffect(() => {
     if (
       screen === "results" &&
-      gameModeRef.current === "quickplay" &&
+      (gameModeRef.current === "quickplay" || gameModeRef.current === "windChallenge") &&
       results.length > 0
     ) {
       const s = loadStats();
@@ -303,12 +360,18 @@ export default function Home() {
     if (gameModeRef.current === "voyage" && voyage) {
       return voyage.legs.map((l) => l.name);
     }
+    if (gameModeRef.current === "windChallenge") {
+      return windChallenges.map((wc) => wc.instruction);
+    }
     return challenges.map((c) => c.instruction);
   };
 
   const getMaxPossible = (): number => {
     if (gameModeRef.current === "voyage" && voyage) {
       return voyage.legs.reduce((sum, l) => sum + l.points + 100, 0);
+    }
+    if (gameModeRef.current === "windChallenge") {
+      return windChallenges.reduce((sum, wc) => sum + wc.points + 100, 0);
     }
     return challenges.reduce((sum, c) => sum + c.points + 100, 0);
   };
@@ -380,11 +443,8 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.actions}>
-            <button className={styles.btnPrimary} onClick={startQuickPlay}>
-              Quick Play
-            </button>
-            <button className={styles.btnSecondary} onClick={startVoyage}>
-              Voyage Mode
+            <button className={styles.btnPrimary} onClick={() => setScreen("gameMenu")}>
+              Play
             </button>
             <button
               className={styles.btnOutline}
@@ -395,6 +455,65 @@ export default function Home() {
             >
               Free Compass
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Game Mode Menu
+  if (screen === "gameMenu") {
+    return (
+      <div className={styles.screen}>
+        <div className={styles.topBar}>
+          <button className={styles.btnIcon} onClick={goHome}>
+            &larr;
+          </button>
+          <span className={styles.topBarTitle}>Select Game Mode</span>
+          <span />
+        </div>
+        <div className={styles.menuContent}>
+          <div
+            className={styles.menuCard}
+            onClick={startQuickPlay}
+          >
+            <div className={styles.menuCardIcon}>&#9978;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Quick Play</h3>
+              <p className={styles.menuCardDesc}>
+                5 compass challenges. Find the correct heading before time runs out!
+              </p>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+
+          <div
+            className={styles.menuCard}
+            onClick={startVoyage}
+          >
+            <div className={styles.menuCardIcon}>&#9971;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Voyage Mode</h3>
+              <p className={styles.menuCardDesc}>
+                Navigate a multi-leg sailing route across the seas.
+              </p>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
+          </div>
+
+          <div
+            className={styles.menuCard}
+            onClick={startWindChallenge}
+          >
+            <div className={`${styles.menuCardIcon} ${styles.windIcon}`}>&#9973;</div>
+            <div className={styles.menuCardBody}>
+              <h3 className={styles.menuCardTitle}>Wind Challenge</h3>
+              <p className={styles.menuCardDesc}>
+                Sail with the wind! Compensate for wind drift to reach your destination.
+              </p>
+              <span className={styles.menuBadge}>NEW</span>
+            </div>
+            <div className={styles.menuCardArrow}>&rsaquo;</div>
           </div>
         </div>
       </div>
@@ -522,6 +641,70 @@ export default function Home() {
     );
   }
 
+  // Wind Challenge
+  if (screen === "windChallenge" && currentWindChallenge) {
+    return (
+      <div className={styles.screen}>
+        <div className={styles.topBar}>
+          <button
+            className={styles.btnIcon}
+            onClick={() => {
+              if (confirm("Quit this challenge? Progress will be lost.")) goHome();
+            }}
+          >
+            &larr;
+          </button>
+          <TimerBar
+            duration={timerDuration}
+            running={timerRunning}
+            onComplete={handleTimerComplete}
+            onTick={handleTimerTick}
+          />
+          <div className={styles.scoreDisplay}>
+            <span>{score}</span> pts
+          </div>
+        </div>
+
+        <div className={styles.challengeHeader}>
+          <div className={styles.windInfoBar}>
+            <span className={styles.windInfoIcon}>&#127788;&#65039;</span>
+            <span className={styles.windInfoText}>
+              Wind from <strong>{currentWindChallenge.windLabel}</strong>
+            </span>
+            <span className={styles.windInfoOffset}>
+              Compensate {currentWindChallenge.windOffset}&deg;
+            </span>
+          </div>
+          <div className={styles.instruction}>{currentWindChallenge.instruction}</div>
+          <div className={styles.detail}>{currentWindChallenge.detail}</div>
+          <div className={styles.counter}>
+            {windIndex + 1} / {windChallenges.length}
+          </div>
+        </div>
+
+        <CompassRose
+          heading={compass.heading}
+          targetBearing={windTarget}
+          showTarget
+          locked={locked}
+          windMode
+          windDirection={currentWindChallenge.windDirection}
+          destinationBearing={currentWindChallenge.destinationBearing}
+        />
+
+        <AccuracyMeter accuracy={accuracy} label="On Course" />
+
+        <Feedback
+          visible={feedback.visible}
+          success={feedback.success}
+          message={feedback.message}
+          points={feedback.points}
+          onDone={handleFeedbackDone}
+        />
+      </div>
+    );
+  }
+
   // Results
   if (screen === "results") {
     const labels = getLabels();
@@ -533,6 +716,8 @@ export default function Home() {
             <h2>
               {gameModeRef.current === "voyage" && voyage
                 ? `${voyage.name} Complete!`
+                : gameModeRef.current === "windChallenge"
+                ? "Wind Challenge Complete!"
                 : "Challenge Complete!"}
             </h2>
           </div>
@@ -570,7 +755,11 @@ export default function Home() {
             <button
               className={styles.btnPrimary}
               onClick={
-                gameModeRef.current === "voyage" ? startVoyage : startQuickPlay
+                gameModeRef.current === "voyage"
+                  ? startVoyage
+                  : gameModeRef.current === "windChallenge"
+                  ? startWindChallenge
+                  : startQuickPlay
               }
             >
               Play Again

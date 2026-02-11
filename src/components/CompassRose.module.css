@@ -207,12 +207,122 @@
   color: #0088aa;
 }
 
+/* === Boat Center (wind mode) === */
+.boatCenter {
+  position: absolute;
+  font-size: 1.8rem;
+  z-index: 6;
+  filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.5));
+  line-height: 1;
+}
+
+/* === Wind Arrow === */
+.windArrow {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  transition: transform 0.3s ease-out;
+}
+
+.windArrowShaft {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.windArrowHead {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 16px solid #00e5ff;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.6));
+}
+
+.windDashes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.windDashes span {
+  display: block;
+  width: 3px;
+  height: 10px;
+  background: #00e5ff;
+  border-radius: 2px;
+  opacity: 0.7;
+  animation: windDashFlow 1.2s ease-in-out infinite;
+}
+
+.windDashes span:nth-child(2) {
+  animation-delay: 0.2s;
+  opacity: 0.5;
+}
+
+.windDashes span:nth-child(3) {
+  animation-delay: 0.4s;
+  opacity: 0.3;
+}
+
+@keyframes windDashFlow {
+  0%, 100% { opacity: 0.2; transform: translateY(0); }
+  50% { opacity: 0.8; transform: translateY(3px); }
+}
+
+.windLabel {
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100%);
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #00e5ff;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* === Destination Flag === */
+.destinationFlag {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.flagIcon {
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.5));
+  animation: flagBob 2s ease-in-out infinite;
+}
+
+@keyframes flagBob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-3px); }
+}
+
 @media (max-height: 600px) {
   .frame {
     width: min(55vw, 220px);
     height: min(55vw, 220px);
   }
   .bearingValue { font-size: 2rem; }
+  .boatCenter { font-size: 1.4rem; }
 }
 
 @media (max-height: 500px) {
@@ -222,4 +332,5 @@
   }
   .cardinal { font-size: 0.9rem; }
   .north { font-size: 1.1rem; }
+  .boatCenter { font-size: 1.2rem; }
 }

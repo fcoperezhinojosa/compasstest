@@ -8,6 +8,9 @@ interface CompassRoseProps {
   showTarget?: boolean;
   locked?: boolean;
   size?: "normal" | "compact";
+  windMode?: boolean;
+  windDirection?: number; // degrees the wind blows FROM
+  destinationBearing?: number; // where the boat wants to go
 }
 
 export default function CompassRose({
@@ -16,6 +19,9 @@ export default function CompassRose({
   showTarget = false,
   locked = false,
   size = "normal",
+  windMode = false,
+  windDirection,
+  destinationBearing,
 }: CompassRoseProps) {
   return (
     <div className={`${styles.container} ${size === "compact" ? styles.compact : ""}`}>
@@ -26,6 +32,33 @@ export default function CompassRose({
             style={{ transform: `rotate(${targetBearing}deg)` }}
           />
         )}
+
+        {/* Wind arrow overlay - shows wind direction blowing FROM */}
+        {windMode && windDirection !== undefined && (
+          <div
+            className={styles.windArrow}
+            style={{ transform: `rotate(${windDirection}deg)` }}
+          >
+            <div className={styles.windArrowShaft}>
+              <div className={styles.windArrowHead} />
+              <div className={styles.windDashes}>
+                <span /><span /><span />
+              </div>
+            </div>
+            <div className={styles.windLabel}>WIND</div>
+          </div>
+        )}
+
+        {/* Destination flag indicator for wind mode */}
+        {windMode && destinationBearing !== undefined && (
+          <div
+            className={styles.destinationFlag}
+            style={{ transform: `rotate(${destinationBearing}deg)` }}
+          >
+            <div className={styles.flagIcon}>&#9873;</div>
+          </div>
+        )}
+
         <div
           className={styles.rose}
           style={{ transform: `rotate(${-heading}deg)` }}
@@ -43,7 +76,13 @@ export default function CompassRose({
           </div>
         </div>
         <div className={styles.needle} />
-        <div className={styles.centerDot} />
+
+        {/* Boat icon in center for wind mode, regular dot otherwise */}
+        {windMode ? (
+          <div className={styles.boatCenter}>&#9973;</div>
+        ) : (
+          <div className={styles.centerDot} />
+        )}
       </div>
       <div className={styles.bearingDisplay}>
         <span className={styles.bearingValue}>{Math.round(heading)}</span>
