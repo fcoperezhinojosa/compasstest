@@ -39,11 +39,11 @@ export default function Feedback({
         {message}
       </div>
       <div className={styles.points}>
-        {success ? `+${points} points` : "No points"}
+        {success ? `+${points} puntos` : "Sin puntos"}
       </div>
       {sailingTip && (
         <div className={styles.tipBox}>
-          <div className={styles.tipLabel}>Sailing Tip</div>
+          <div className={styles.tipLabel}>Consejo de navegación</div>
           <div className={styles.tipText}>{sailingTip}</div>
         </div>
       )}

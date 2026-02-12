@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Compass Challenge - Sailboat Navigation Test",
+  title: "Desafío de Brújula - Prueba de Navegación a Vela",
   description:
-    "A mobile compass challenge app. Use your device compass to navigate timed challenges and sailboat voyages.",
+    "Una aplicación móvil de desafío de brújula. Usa la brújula de tu dispositivo para superar retos cronometrados y travesías en velero.",
 };
 
 export const viewport: Viewport = {
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />

@@ -38,57 +38,57 @@ export interface Stats {
 }
 
 const QUICK_PLAY_POOL: Challenge[] = [
-  { type: "cardinal", target: 0, instruction: "Find the North!", detail: "Point your device towards North (0\u00b0)", timeLimit: 15, threshold: 15, points: 100 },
-  { type: "cardinal", target: 90, instruction: "Find the East!", detail: "Point your device towards East (90\u00b0)", timeLimit: 15, threshold: 15, points: 100 },
-  { type: "cardinal", target: 180, instruction: "Find the South!", detail: "Point your device towards South (180\u00b0)", timeLimit: 15, threshold: 15, points: 100 },
-  { type: "cardinal", target: 270, instruction: "Find the West!", detail: "Point your device towards West (270\u00b0)", timeLimit: 15, threshold: 15, points: 100 },
-  { type: "bearing", target: 45, instruction: "Navigate Northeast!", detail: "Find bearing 45\u00b0 (NE)", timeLimit: 12, threshold: 12, points: 150 },
-  { type: "bearing", target: 135, instruction: "Navigate Southeast!", detail: "Find bearing 135\u00b0 (SE)", timeLimit: 12, threshold: 12, points: 150 },
-  { type: "bearing", target: 225, instruction: "Navigate Southwest!", detail: "Find bearing 225\u00b0 (SW)", timeLimit: 12, threshold: 12, points: 150 },
-  { type: "bearing", target: 315, instruction: "Navigate Northwest!", detail: "Find bearing 315\u00b0 (NW)", timeLimit: 12, threshold: 12, points: 150 },
-  { type: "precision", target: 30, instruction: "Precise bearing: 30\u00b0", detail: "Navigate to exactly 30\u00b0 NNE", timeLimit: 10, threshold: 8, points: 200 },
-  { type: "precision", target: 60, instruction: "Precise bearing: 60\u00b0", detail: "Navigate to exactly 60\u00b0 ENE", timeLimit: 10, threshold: 8, points: 200 },
-  { type: "precision", target: 120, instruction: "Precise bearing: 120\u00b0", detail: "Navigate to exactly 120\u00b0 ESE", timeLimit: 10, threshold: 8, points: 200 },
-  { type: "precision", target: 150, instruction: "Precise bearing: 150\u00b0", detail: "Navigate to exactly 150\u00b0 SSE", timeLimit: 10, threshold: 8, points: 200 },
-  { type: "precision", target: 210, instruction: "Precise bearing: 210\u00b0", detail: "Navigate to exactly 210\u00b0 SSW", timeLimit: 10, threshold: 8, points: 200 },
-  { type: "precision", target: 240, instruction: "Precise bearing: 240\u00b0", detail: "Navigate to exactly 240\u00b0 WSW", timeLimit: 10, threshold: 8, points: 200 },
-  { type: "precision", target: 300, instruction: "Precise bearing: 300\u00b0", detail: "Navigate to exactly 300\u00b0 WNW", timeLimit: 10, threshold: 8, points: 200 },
-  { type: "precision", target: 330, instruction: "Precise bearing: 330\u00b0", detail: "Navigate to exactly 330\u00b0 NNW", timeLimit: 10, threshold: 8, points: 200 },
+  { type: "cardinal", target: 0, instruction: "¡Encuentra el Norte!", detail: "Apunta tu dispositivo hacia el Norte (0°)", timeLimit: 15, threshold: 15, points: 100 },
+  { type: "cardinal", target: 90, instruction: "¡Encuentra el Este!", detail: "Apunta tu dispositivo hacia el Este (90°)", timeLimit: 15, threshold: 15, points: 100 },
+  { type: "cardinal", target: 180, instruction: "¡Encuentra el Sur!", detail: "Apunta tu dispositivo hacia el Sur (180°)", timeLimit: 15, threshold: 15, points: 100 },
+  { type: "cardinal", target: 270, instruction: "¡Encuentra el Oeste!", detail: "Apunta tu dispositivo hacia el Oeste (270°)", timeLimit: 15, threshold: 15, points: 100 },
+  { type: "bearing", target: 45, instruction: "¡Navega al Noreste!", detail: "Encuentra el rumbo 45° (NE)", timeLimit: 12, threshold: 12, points: 150 },
+  { type: "bearing", target: 135, instruction: "¡Navega al Sureste!", detail: "Encuentra el rumbo 135° (SE)", timeLimit: 12, threshold: 12, points: 150 },
+  { type: "bearing", target: 225, instruction: "¡Navega al Suroeste!", detail: "Encuentra el rumbo 225° (SO)", timeLimit: 12, threshold: 12, points: 150 },
+  { type: "bearing", target: 315, instruction: "¡Navega al Noroeste!", detail: "Encuentra el rumbo 315° (NO)", timeLimit: 12, threshold: 12, points: 150 },
+  { type: "precision", target: 30, instruction: "Rumbo preciso: 30°", detail: "Navega exactamente a 30° NNE", timeLimit: 10, threshold: 8, points: 200 },
+  { type: "precision", target: 60, instruction: "Rumbo preciso: 60°", detail: "Navega exactamente a 60° ENE", timeLimit: 10, threshold: 8, points: 200 },
+  { type: "precision", target: 120, instruction: "Rumbo preciso: 120°", detail: "Navega exactamente a 120° ESE", timeLimit: 10, threshold: 8, points: 200 },
+  { type: "precision", target: 150, instruction: "Rumbo preciso: 150°", detail: "Navega exactamente a 150° SSE", timeLimit: 10, threshold: 8, points: 200 },
+  { type: "precision", target: 210, instruction: "Rumbo preciso: 210°", detail: "Navega exactamente a 210° SSO", timeLimit: 10, threshold: 8, points: 200 },
+  { type: "precision", target: 240, instruction: "Rumbo preciso: 240°", detail: "Navega exactamente a 240° OSO", timeLimit: 10, threshold: 8, points: 200 },
+  { type: "precision", target: 300, instruction: "Rumbo preciso: 300°", detail: "Navega exactamente a 300° ONO", timeLimit: 10, threshold: 8, points: 200 },
+  { type: "precision", target: 330, instruction: "Rumbo preciso: 330°", detail: "Navega exactamente a 330° NNO", timeLimit: 10, threshold: 8, points: 200 },
 ];
 
 export const VOYAGE_ROUTES: VoyageRoute[] = [
   {
-    name: "Caribbean Run",
-    description: "A classic island-hopping route through the Caribbean.",
+    name: "Ruta del Caribe",
+    description: "Una ruta clásica de isla en isla por el Caribe.",
     legs: [
-      { target: 90, name: "Depart East", detail: "Leave port heading East (90\u00b0)", timeLimit: 15, threshold: 15, points: 100 },
-      { target: 135, name: "Southeast to Barbados", detail: "Turn Southeast to 135\u00b0", timeLimit: 12, threshold: 12, points: 150 },
-      { target: 270, name: "West to Jamaica", detail: "Come about! Head West (270\u00b0)", timeLimit: 15, threshold: 15, points: 100 },
-      { target: 315, name: "Northwest to Cuba", detail: "Bear Northwest to 315\u00b0", timeLimit: 12, threshold: 12, points: 150 },
-      { target: 0, name: "North to Home", detail: "Final leg! Head North (0\u00b0)", timeLimit: 15, threshold: 15, points: 200 },
+      { target: 90, name: "Partida al Este", detail: "Zarpa rumbo al Este (90°)", timeLimit: 15, threshold: 15, points: 100 },
+      { target: 135, name: "Sureste hacia Barbados", detail: "Vira al Sureste a 135°", timeLimit: 12, threshold: 12, points: 150 },
+      { target: 270, name: "Oeste hacia Jamaica", detail: "¡Virada! Rumbo al Oeste (270°)", timeLimit: 15, threshold: 15, points: 100 },
+      { target: 315, name: "Noroeste hacia Cuba", detail: "Rumbo Noroeste a 315°", timeLimit: 12, threshold: 12, points: 150 },
+      { target: 0, name: "Norte a casa", detail: "¡Última etapa! Rumbo Norte (0°)", timeLimit: 15, threshold: 15, points: 200 },
     ],
   },
   {
-    name: "Mediterranean Crossing",
-    description: "Navigate the ancient trade routes of the Mediterranean.",
+    name: "Travesía del Mediterráneo",
+    description: "Navega las antiguas rutas comerciales del Mediterráneo.",
     legs: [
-      { target: 180, name: "South from Gibraltar", detail: "Head South into the strait (180\u00b0)", timeLimit: 15, threshold: 15, points: 100 },
-      { target: 90, name: "East along the coast", detail: "Turn East along Africa (90\u00b0)", timeLimit: 15, threshold: 15, points: 100 },
-      { target: 45, name: "Northeast to Sardinia", detail: "Bear NE towards Sardinia (45\u00b0)", timeLimit: 12, threshold: 12, points: 150 },
-      { target: 90, name: "East to Greece", detail: "Continue East to Greece (90\u00b0)", timeLimit: 12, threshold: 12, points: 150 },
-      { target: 0, name: "North to Adriatic", detail: "Turn North to the Adriatic (0\u00b0)", timeLimit: 12, threshold: 12, points: 150 },
-      { target: 270, name: "West to Home Port", detail: "Return West to home (270\u00b0)", timeLimit: 15, threshold: 15, points: 200 },
+      { target: 180, name: "Sur desde Gibraltar", detail: "Rumbo Sur hacia el estrecho (180°)", timeLimit: 15, threshold: 15, points: 100 },
+      { target: 90, name: "Este por la costa", detail: "Vira al Este bordeando África (90°)", timeLimit: 15, threshold: 15, points: 100 },
+      { target: 45, name: "Noreste hacia Cerdeña", detail: "Rumbo NE hacia Cerdeña (45°)", timeLimit: 12, threshold: 12, points: 150 },
+      { target: 90, name: "Este hacia Grecia", detail: "Continúa al Este hacia Grecia (90°)", timeLimit: 12, threshold: 12, points: 150 },
+      { target: 0, name: "Norte al Adriático", detail: "Vira al Norte hacia el Adriático (0°)", timeLimit: 12, threshold: 12, points: 150 },
+      { target: 270, name: "Oeste a puerto", detail: "Regresa al Oeste a puerto (270°)", timeLimit: 15, threshold: 15, points: 200 },
     ],
   },
   {
-    name: "Pacific Storm Chase",
-    description: "A daring route through Pacific squalls - be quick and precise!",
+    name: "Temporal del Pacífico",
+    description: "Una ruta atrevida entre temporales del Pacífico. ¡Sé rápido y preciso!",
     legs: [
-      { target: 225, name: "Southwest departure", detail: "Head SW into open water (225\u00b0)", timeLimit: 10, threshold: 10, points: 200 },
-      { target: 180, name: "South through the storm", detail: "Turn South, brace yourself! (180\u00b0)", timeLimit: 8, threshold: 10, points: 250 },
-      { target: 90, name: "East - eye of the storm", detail: "Quick! Head East (90\u00b0)", timeLimit: 8, threshold: 10, points: 250 },
-      { target: 0, name: "North to safety", detail: "Break North to clear skies (0\u00b0)", timeLimit: 8, threshold: 10, points: 250 },
-      { target: 315, name: "NW to harbor", detail: "NW to safe harbor (315\u00b0)", timeLimit: 10, threshold: 10, points: 300 },
+      { target: 225, name: "Partida al Suroeste", detail: "Rumbo SO a mar abierto (225°)", timeLimit: 10, threshold: 10, points: 200 },
+      { target: 180, name: "Sur entre la tormenta", detail: "Vira al Sur, ¡agárrate! (180°)", timeLimit: 8, threshold: 10, points: 250 },
+      { target: 90, name: "Este - ojo del temporal", detail: "¡Rápido! Rumbo Este (90°)", timeLimit: 8, threshold: 10, points: 250 },
+      { target: 0, name: "Norte a salvo", detail: "Rumbo Norte a cielos despejados (0°)", timeLimit: 8, threshold: 10, points: 250 },
+      { target: 315, name: "NO hacia el puerto", detail: "Rumbo NO al puerto seguro (315°)", timeLimit: 10, threshold: 10, points: 300 },
     ],
   },
 ];
@@ -162,16 +162,16 @@ export function saveStats(stats: Stats): void {
 
 export function getSuccessMessage(): string {
   const messages = [
-    "On target!", "Well navigated!", "Steady as she goes!",
-    "Perfect heading!", "Aye aye, Captain!", "Spot on!",
+    "¡En el blanco!", "¡Bien navegado!", "¡Rumbo firme!",
+    "¡Rumbo perfecto!", "¡A la orden, Capitán!", "¡Perfecto!",
   ];
   return messages[Math.floor(Math.random() * messages.length)];
 }
 
 export function getFailMessage(): string {
   const messages = [
-    "Lost at sea!", "Off course!", "Man overboard!",
-    "Time's up!", "Wrong heading!", "Adrift!",
+    "¡Perdido en el mar!", "¡Fuera de rumbo!", "¡Hombre al agua!",
+    "¡Se acabó el tiempo!", "¡Rumbo equivocado!", "¡A la deriva!",
   ];
   return messages[Math.floor(Math.random() * messages.length)];
 }
@@ -192,40 +192,40 @@ export type PointOfSail =
 
 export interface PointOfSailInfo {
   name: PointOfSail;
-  label: string;           // English display name
-  angleFromWind: number;   // Angle relative to wind source
-  description: string;     // What this point of sail means
-  tip: string;             // Educational tip shown after challenge
+  label: string;           // Nombre visible
+  angleFromWind: number;   // Ángulo respecto al viento
+  description: string;     // Descripción del rumbo de vela
+  tip: string;             // Consejo educativo mostrado tras el desafío
 }
 
 export const POINTS_OF_SAIL: Record<PointOfSail, PointOfSailInfo> = {
   "ceñida": {
     name: "ceñida",
-    label: "Close-Hauled (Ceñida)",
+    label: "Ceñida",
     angleFromWind: 45,
-    description: "Sailing as close to the wind as possible (~45°). Requires zigzag tacking to go upwind.",
-    tip: "Close-hauled (ceñida) is the closest angle you can sail toward the wind. Sailors zigzag (tack) to travel upwind since you can't sail directly into the wind!",
+    description: "Navegando lo más cerca posible del viento (~45°). Requiere bordadas en zigzag para avanzar contra el viento.",
+    tip: "La ceñida es el ángulo más cerrado al que puedes navegar respecto al viento. ¡Los navegantes hacen bordadas (zigzag) porque no se puede navegar directamente contra el viento!",
   },
   "través": {
     name: "través",
-    label: "Beam Reach (Través)",
+    label: "Través",
     angleFromWind: 90,
-    description: "Wind blows from the side (~90°). Good speed and stability.",
-    tip: "Beam reach (través) means the wind hits your boat from the side at 90°. This is often the fastest and most stable point of sail!",
+    description: "El viento sopla de costado (~90°). Buena velocidad y estabilidad.",
+    tip: "El través significa que el viento llega a tu barco de costado a 90°. ¡Es a menudo el rumbo más rápido y estable de todos!",
   },
   "largo": {
     name: "largo",
-    label: "Broad Reach (Largo)",
+    label: "Largo",
     angleFromWind: 135,
-    description: "Wind comes from behind at an angle (~135°). Fast sailing.",
-    tip: "Broad reach (largo) is sailing with the wind coming from behind at an angle. It's fast sailing — but watch for an accidental jibe (trasluchada)!",
+    description: "El viento llega desde atrás en ángulo (~135°). Navegación rápida.",
+    tip: "El largo es navegar con el viento viniendo desde atrás en ángulo. Es una navegación rápida, ¡pero cuidado con una trasluchada accidental!",
   },
   "popa": {
     name: "popa",
-    label: "Running (Popa)",
+    label: "Popa",
     angleFromWind: 180,
-    description: "Wind blows directly from behind (~180°). Less speed from sail lift.",
-    tip: "Running (popa) means the wind pushes from directly behind. The sails can't generate lift, so speed is actually lower than a broad reach. Be careful of jibing!",
+    description: "El viento sopla directamente desde atrás (~180°). Menor velocidad por falta de sustentación en las velas.",
+    tip: "Navegar en popa significa que el viento empuja directamente desde atrás. Las velas no generan sustentación, así que la velocidad es menor que a un largo. ¡Cuidado con las trasluchadas!",
   },
 };
 
@@ -249,8 +249,8 @@ function normalizeAngle(angle: number): number {
 }
 
 const DIRECTION_NAMES: Record<number, string> = {
-  0: "North", 45: "Northeast", 90: "East", 135: "Southeast",
-  180: "South", 225: "Southwest", 270: "West", 315: "Northwest",
+  0: "Norte", 45: "Noreste", 90: "Este", 135: "Sureste",
+  180: "Sur", 225: "Suroeste", 270: "Oeste", 315: "Noroeste",
 };
 
 function getWindLabel(deg: number): string {
@@ -314,8 +314,7 @@ export function generateWindChallenge(difficulty: SailingDifficulty = "beginner"
       : windFrom - angleOffset
   );
 
-  // Build the instruction text
-  const tackLabel = tack === "starboard" ? "starboard tack" : "port tack";
+  const tackLabel = tack === "starboard" ? "amura de estribor" : "amura de babor";
   const targetHint = config.showTarget ? ` → ${Math.round(targetBearing)}°` : "";
   const windName = getWindLabel(windFrom);
 
@@ -328,8 +327,8 @@ export function generateWindChallenge(difficulty: SailingDifficulty = "beginner"
     timeLimit: config.timeLimit,
     threshold: config.threshold,
     points: config.basePoints,
-    instruction: `Sail ${posInfo.label}!`,
-    detail: `Wind from ${windName} — ${tackLabel}${targetHint}`,
+    instruction: `¡Navega a ${posInfo.label}!`,
+    detail: `Viento del ${windName} — ${tackLabel}${targetHint}`,
     sailingTip: posInfo.tip,
     difficulty,
   };
@@ -363,22 +362,22 @@ export function getWindTarget(challenge: WindChallenge): number {
 export const SAILING_TUTORIAL_STEPS = [
   {
     icon: "💨",
-    title: "Read the Wind",
-    text: "The cyan arrow on the compass shows where the wind blows FROM. Reading the wind is the first skill every sailor learns.",
+    title: "Lee el viento",
+    text: "La flecha cian en la brújula indica de dónde sopla el viento. Leer el viento es lo primero que aprende todo navegante.",
   },
   {
     icon: "⛵",
-    title: "Points of Sail",
-    text: "Your angle relative to the wind determines your 'point of sail': Ceñida (45°), Través (90°), Largo (135°), or Popa (180°).",
+    title: "Rumbos de vela",
+    text: "Tu ángulo respecto al viento determina tu rumbo de vela: Ceñida (45°), Través (90°), Largo (135°) o Popa (180°).",
   },
   {
     icon: "🧭",
-    title: "Find the Heading",
-    text: "Calculate the correct bearing from the wind direction + point of sail angle, then rotate your device to match!",
+    title: "Encuentra el rumbo",
+    text: "Calcula el rumbo correcto a partir de la dirección del viento + el ángulo del rumbo de vela, ¡y gira tu dispositivo para coincidir!",
   },
   {
     icon: "⭐",
-    title: "Hold Steady",
-    text: "Keep your heading steady for 1.2 seconds to lock in. Accuracy and speed earn bonus points. Good luck, Captain!",
+    title: "Mantén el rumbo",
+    text: "Mantén el rumbo estable durante 1,2 segundos para fijarlo. La precisión y la velocidad dan puntos extra. ¡Buena suerte, Capitán!",
   },
 ];
