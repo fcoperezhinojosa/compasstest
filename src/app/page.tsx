@@ -422,12 +422,12 @@ export default function Home() {
       <div className={styles.screen}>
         <div className={styles.centered}>
           <div className={styles.phoneIcon}>&#128241;</div>
-          <h1 className={styles.titleAccent}>Mobile Only</h1>
+          <h1 className={styles.titleAccent}>Solo para móvil</h1>
           <p className={styles.subtitle}>
-            This app requires a mobile device with a compass sensor.
+            Esta aplicación requiere un dispositivo móvil con sensor de brújula.
           </p>
           <p className={styles.dim}>
-            Please open this page on your phone or tablet.
+            Por favor, abre esta página en tu teléfono o tableta.
           </p>
         </div>
       </div>
@@ -440,13 +440,13 @@ export default function Home() {
       <div className={styles.screen}>
         <div className={styles.centered}>
           <div className={styles.compassIconLarge}>&#9978;</div>
-          <h1 className={styles.titleGradient}>Compass Challenge</h1>
-          <p className={styles.subtitle}>A Sailboat Navigation Test</p>
+          <h1 className={styles.titleGradient}>Desafío de Brújula</h1>
+          <p className={styles.subtitle}>Prueba de navegación a vela</p>
           <p className={styles.dim}>
-            This app needs access to your device&apos;s compass sensor.
+            Esta aplicación necesita acceso al sensor de brújula de tu dispositivo.
           </p>
           <button className={styles.btnPrimary} onClick={handlePermission}>
-            Enable Compass
+            Activar brújula
           </button>
         </div>
       </div>
@@ -460,22 +460,22 @@ export default function Home() {
         <div className={styles.homeContent}>
           <div className={styles.homeHeader}>
             <div className={styles.compassIconAnimated}>&#9978;</div>
-            <h1 className={styles.titleGradient}>Compass Challenge</h1>
-            <p className={styles.subtitle}>Sailboat Navigation Test</p>
+            <h1 className={styles.titleGradient}>Desafío de Brújula</h1>
+            <p className={styles.subtitle}>Prueba de navegación a vela</p>
           </div>
           <div className={styles.statsRow}>
             <div className={styles.statBox}>
               <span className={styles.statValue}>{stats.bestScore}</span>
-              <span className={styles.statLabel}>Best Score</span>
+              <span className={styles.statLabel}>Mejor puntuación</span>
             </div>
             <div className={styles.statBox}>
               <span className={styles.statValue}>{stats.challengesWon}</span>
-              <span className={styles.statLabel}>Wins</span>
+              <span className={styles.statLabel}>Victorias</span>
             </div>
           </div>
           <div className={styles.actions}>
             <button className={styles.btnPrimary} onClick={() => setScreen("gameMenu")}>
-              Play
+              Jugar
             </button>
             <button
               className={styles.btnOutline}
@@ -484,7 +484,7 @@ export default function Home() {
                 setScreen("freeCompass");
               }}
             >
-              Free Compass
+              Brújula libre
             </button>
           </div>
         </div>
@@ -500,7 +500,7 @@ export default function Home() {
           <button className={styles.btnIcon} onClick={goHome}>
             &larr;
           </button>
-          <span className={styles.topBarTitle}>Select Game Mode</span>
+          <span className={styles.topBarTitle}>Modo de juego</span>
           <span />
         </div>
         <div className={styles.menuContent}>
@@ -510,9 +510,9 @@ export default function Home() {
           >
             <div className={styles.menuCardIcon}>&#9978;</div>
             <div className={styles.menuCardBody}>
-              <h3 className={styles.menuCardTitle}>Quick Play</h3>
+              <h3 className={styles.menuCardTitle}>Partida rápida</h3>
               <p className={styles.menuCardDesc}>
-                5 compass challenges. Find the correct heading before time runs out!
+                5 desafíos de brújula. ¡Encuentra el rumbo correcto antes de que se acabe el tiempo!
               </p>
             </div>
             <div className={styles.menuCardArrow}>&rsaquo;</div>
@@ -524,9 +524,9 @@ export default function Home() {
           >
             <div className={styles.menuCardIcon}>&#9971;</div>
             <div className={styles.menuCardBody}>
-              <h3 className={styles.menuCardTitle}>Voyage Mode</h3>
+              <h3 className={styles.menuCardTitle}>Modo Travesía</h3>
               <p className={styles.menuCardDesc}>
-                Navigate a multi-leg sailing route across the seas.
+                Navega una ruta a vela de varias etapas por los mares.
               </p>
             </div>
             <div className={styles.menuCardArrow}>&rsaquo;</div>
@@ -538,11 +538,11 @@ export default function Home() {
           >
             <div className={`${styles.menuCardIcon} ${styles.windIcon}`}>&#9973;</div>
             <div className={styles.menuCardBody}>
-              <h3 className={styles.menuCardTitle}>Sailing School</h3>
+              <h3 className={styles.menuCardTitle}>Escuela de Vela</h3>
               <p className={styles.menuCardDesc}>
-                Learn the points of sail! Master ceñida, través, largo and popa.
+                ¡Aprende los rumbos de vela! Domina la ceñida, el través, el largo y la popa.
               </p>
-              <span className={styles.menuBadge}>NEW</span>
+              <span className={styles.menuBadge}>NUEVO</span>
             </div>
             <div className={styles.menuCardArrow}>&rsaquo;</div>
           </div>
@@ -559,15 +559,15 @@ export default function Home() {
           <button className={styles.btnIcon} onClick={() => setScreen("gameMenu")}>
             &larr;
           </button>
-          <span className={styles.topBarTitle}>Sailing School</span>
+          <span className={styles.topBarTitle}>Escuela de Vela</span>
           <span />
         </div>
         <div className={styles.menuContent}>
           <div className={styles.diffHeader}>
             <div className={styles.diffIcon}>&#9973;</div>
-            <h2 className={styles.diffTitle}>Choose Your Level</h2>
+            <h2 className={styles.diffTitle}>Elige tu nivel</h2>
             <p className={styles.diffSubtitle}>
-              Learn the points of sail at your own pace
+              Aprende los rumbos de vela a tu ritmo
             </p>
           </div>
 
@@ -577,9 +577,9 @@ export default function Home() {
           >
             <div className={styles.menuCardIcon}>&#127793;</div>
             <div className={styles.menuCardBody}>
-              <h3 className={styles.menuCardTitle}>Beginner</h3>
+              <h3 className={styles.menuCardTitle}>Principiante</h3>
               <p className={styles.menuCardDesc}>
-                Través (beam reach) &amp; Popa (running). Large tolerance, hints shown.
+                Través y popa. Gran tolerancia, con pistas.
               </p>
             </div>
             <div className={styles.menuCardArrow}>&rsaquo;</div>
@@ -591,9 +591,9 @@ export default function Home() {
           >
             <div className={styles.menuCardIcon}>&#9875;</div>
             <div className={styles.menuCardBody}>
-              <h3 className={styles.menuCardTitle}>Intermediate</h3>
+              <h3 className={styles.menuCardTitle}>Intermedio</h3>
               <p className={styles.menuCardDesc}>
-                All 4 points of sail. Moderate tolerance, target bearing shown.
+                Los 4 rumbos de vela. Tolerancia moderada, se muestra el rumbo objetivo.
               </p>
             </div>
             <div className={styles.menuCardArrow}>&rsaquo;</div>
@@ -605,9 +605,9 @@ export default function Home() {
           >
             <div className={styles.menuCardIcon}>&#127942;</div>
             <div className={styles.menuCardBody}>
-              <h3 className={styles.menuCardTitle}>Advanced</h3>
+              <h3 className={styles.menuCardTitle}>Avanzado</h3>
               <p className={styles.menuCardDesc}>
-                All points, tight tolerance, no bearing hints. Calculate it yourself!
+                Todos los rumbos, tolerancia ajustada, sin pistas. ¡Calcúlalo tú mismo!
               </p>
             </div>
             <div className={styles.menuCardArrow}>&rsaquo;</div>
@@ -658,7 +658,7 @@ export default function Home() {
                 className={styles.btnOutline}
                 onClick={() => setTutorialStep((s) => s - 1)}
               >
-                Back
+                Atrás
               </button>
             )}
             <button
@@ -672,7 +672,7 @@ export default function Home() {
                 }
               }}
             >
-              {isLast ? "Start Sailing!" : "Next"}
+              {isLast ? "¡A navegar!" : "Siguiente"}
             </button>
           </div>
         </div>
@@ -688,7 +688,7 @@ export default function Home() {
           <button className={styles.btnIcon} onClick={goHome}>
             &larr;
           </button>
-          <span className={styles.topBarTitle}>Free Compass</span>
+          <span className={styles.topBarTitle}>Brújula libre</span>
           <span />
         </div>
         <CompassRose heading={compass.heading} />
@@ -705,7 +705,7 @@ export default function Home() {
           <button
             className={styles.btnIcon}
             onClick={() => {
-              if (confirm("Quit this challenge? Progress will be lost.")) goHome();
+              if (confirm("¿Abandonar este desafío? Se perderá el progreso.")) goHome();
             }}
           >
             &larr;
@@ -717,7 +717,7 @@ export default function Home() {
             onTick={handleTimerTick}
           />
           <div className={styles.scoreDisplay}>
-            <span>{score}</span> pts
+            <span>{score}</span> ptos
           </div>
         </div>
 
@@ -758,7 +758,7 @@ export default function Home() {
           <button
             className={styles.btnIcon}
             onClick={() => {
-              if (confirm("Quit this voyage? Progress will be lost.")) goHome();
+              if (confirm("¿Abandonar esta travesía? Se perderá el progreso.")) goHome();
             }}
           >
             &larr;
@@ -770,7 +770,7 @@ export default function Home() {
             onTick={handleTimerTick}
           />
           <div className={styles.scoreDisplay}>
-            <span>{score}</span> pts
+            <span>{score}</span> ptos
           </div>
         </div>
 
@@ -782,7 +782,7 @@ export default function Home() {
 
         <div className={styles.challengeHeader}>
           <div className={styles.voyageLegLabel}>
-            Leg {voyageLeg + 1} of {voyage.legs.length}
+            Etapa {voyageLeg + 1} de {voyage.legs.length}
           </div>
           <div className={styles.instruction}>{leg.name}</div>
           <div className={styles.detail}>{leg.detail}</div>
@@ -796,7 +796,7 @@ export default function Home() {
           size="compact"
         />
 
-        <AccuracyMeter accuracy={accuracy} label="On Course" />
+        <AccuracyMeter accuracy={accuracy} label="En rumbo" />
       </div>
     );
   }
@@ -809,7 +809,7 @@ export default function Home() {
           <button
             className={styles.btnIcon}
             onClick={() => {
-              if (confirm("Quit this challenge? Progress will be lost.")) goHome();
+              if (confirm("¿Abandonar este desafío? Se perderá el progreso.")) goHome();
             }}
           >
             &larr;
@@ -821,7 +821,7 @@ export default function Home() {
             onTick={handleTimerTick}
           />
           <div className={styles.scoreDisplay}>
-            <span>{score}</span> pts
+            <span>{score}</span> ptos
           </div>
         </div>
 
@@ -829,16 +829,16 @@ export default function Home() {
           <div className={styles.windInfoBar}>
             <span className={styles.windInfoIcon}>&#127788;&#65039;</span>
             <span className={styles.windInfoText}>
-              Wind from <strong>{currentWindChallenge.windLabel}</strong>
+              Viento del <strong>{currentWindChallenge.windLabel}</strong>
             </span>
             <span className={styles.windInfoOffset}>
-              {currentWindChallenge.tack === "starboard" ? "Starboard" : "Port"} tack
+              Amura de {currentWindChallenge.tack === "starboard" ? "estribor" : "babor"}
             </span>
           </div>
           <div className={styles.instruction}>{currentWindChallenge.instruction}</div>
           <div className={styles.detail}>{currentWindChallenge.detail}</div>
           <div className={styles.posBadge}>
-            {POINTS_OF_SAIL[currentWindChallenge.pointOfSail].angleFromWind}&deg; from wind
+            {POINTS_OF_SAIL[currentWindChallenge.pointOfSail].angleFromWind}&deg; del viento
           </div>
           <div className={styles.counter}>
             {windIndex + 1} / {windChallenges.length}
@@ -855,7 +855,7 @@ export default function Home() {
           destinationBearing={currentWindChallenge.targetBearing}
         />
 
-        <AccuracyMeter accuracy={accuracy} label="On Course" />
+        <AccuracyMeter accuracy={accuracy} label="En rumbo" />
 
         <Feedback
           visible={feedback.visible}
@@ -879,15 +879,15 @@ export default function Home() {
             <div className={styles.resultsIcon}>&#9978;</div>
             <h2>
               {gameModeRef.current === "voyage" && voyage
-                ? `${voyage.name} Complete!`
+                ? `¡${voyage.name} completada!`
                 : gameModeRef.current === "windChallenge"
-                ? "Sailing Lesson Complete!"
-                : "Challenge Complete!"}
+                ? "¡Lección de vela completada!"
+                : "¡Desafío completado!"}
             </h2>
           </div>
           <div className={styles.resultsScore}>
             <span className={styles.resultsScoreValue}>{score}</span>
-            <span className={styles.resultsScoreLabel}>Total Points</span>
+            <span className={styles.resultsScoreLabel}>Puntos totales</span>
           </div>
           <div className={styles.stars}>
             {[0, 1, 2].map((i) => (
@@ -903,14 +903,14 @@ export default function Home() {
             {results.map((r, i) => (
               <div key={i} className={styles.resultRow}>
                 <span className={styles.resultLabel}>
-                  {labels[i] || `Challenge ${i + 1}`}
+                  {labels[i] || `Desafío ${i + 1}`}
                 </span>
                 <span
                   className={`${styles.resultValue} ${
                     r.success ? styles.successText : styles.failText
                   }`}
                 >
-                  {r.success ? `+${r.points}` : "Failed"}
+                  {r.success ? `+${r.points}` : "Fallido"}
                 </span>
               </div>
             ))}
@@ -926,10 +926,10 @@ export default function Home() {
                   : startQuickPlay
               }
             >
-              Play Again
+              Jugar de nuevo
             </button>
             <button className={styles.btnOutline} onClick={goHome}>
-              Home
+              Inicio
             </button>
           </div>
         </div>

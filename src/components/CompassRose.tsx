@@ -45,7 +45,7 @@ export default function CompassRose({
                 <span /><span /><span />
               </div>
             </div>
-            <div className={styles.windLabel}>WIND</div>
+            <div className={styles.windLabel}>VIENTO</div>
           </div>
         )}
 
@@ -67,11 +67,11 @@ export default function CompassRose({
             <span className={`${styles.cardinal} ${styles.north}`}>N</span>
             <span className={`${styles.cardinal} ${styles.east}`}>E</span>
             <span className={`${styles.cardinal} ${styles.south}`}>S</span>
-            <span className={`${styles.cardinal} ${styles.west}`}>W</span>
+            <span className={`${styles.cardinal} ${styles.west}`}>O</span>
             <span className={`${styles.intercardinal} ${styles.ne}`}>NE</span>
             <span className={`${styles.intercardinal} ${styles.se}`}>SE</span>
-            <span className={`${styles.intercardinal} ${styles.sw}`}>SW</span>
-            <span className={`${styles.intercardinal} ${styles.nw}`}>NW</span>
+            <span className={`${styles.intercardinal} ${styles.sw}`}>SO</span>
+            <span className={`${styles.intercardinal} ${styles.nw}`}>NO</span>
             <div className={styles.tickMarks} />
           </div>
         </div>

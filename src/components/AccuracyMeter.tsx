@@ -9,7 +9,7 @@ interface AccuracyMeterProps {
 
 export default function AccuracyMeter({
   accuracy,
-  label = "Accuracy",
+  label = "Precisión",
 }: AccuracyMeterProps) {
   const colorClass =
     accuracy >= 80 ? styles.great : accuracy >= 50 ? styles.good : "";
